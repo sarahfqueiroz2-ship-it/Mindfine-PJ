@@ -30,7 +30,7 @@
             position: fixed;
             width: 110%;
             height: 110%;
-            background-image: url('fundo-a.png');
+            background-image: url('fundos/fundo-a.png');
             background-size: cover;
             background-position: center;
             z-index: 1;
@@ -187,14 +187,14 @@
             margin-top: 8px;
         }
 
-          .user-card {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px;
-            border-radius: 12px;
-            background: var(--surface2);
-        }
+         .user-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    border-radius: 12px;
+    background: transparent;
+}
 
          .user-avatar {
             width: 36px; height: 36px;
@@ -205,14 +205,14 @@
             justify-content: center;
             font-size: 14px;
             font-weight: 700;
-            color: #1283c5;
+            color: #ffffff;
             flex-shrink: 0;
         }
 
            .user-info-name {
             font-size: 13px;
             font-weight: 600;
-            color: var(--text);
+            color: #0097dd;
         }
 
         .user-info-role {
@@ -445,9 +445,8 @@
    <aside class="sidebar" id="sidebar">
     <div class="sidebar-logo">
         <div class="logo-mark">
-            <div class="logo-icon">
-              <img src="skin.png" alt="Logo">
-            </div>
+           <div class="logo-icon"><img src="pandas/skin.png" style="width:32px;height:32px;object-fit:contain;"></div>
+
             <span class="logo-text">Mindfine</span>
         </div>
     </div>

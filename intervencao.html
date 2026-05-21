@@ -37,7 +37,7 @@
         /* ── FUNDO ── */
         .background-layer {
             position: fixed; width: 110%; height: 110%;
-            background-image: url('fundo-a.png');
+            background-image: url('fundos/fundo-a.png');
             background-size: cover; background-position: center;
             z-index: 1; left: -5%; top: -5%;
             filter: blur(8px) brightness(0.6);
@@ -112,16 +112,31 @@
             font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 20px;
         }
         .sidebar-footer { padding: 16px 12px 0; border-top: 1px solid var(--border); margin-top: 8px; }
-        .user-card { display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: 12px; background: var(--surface2); }
-        .user-avatar {
-            width: 36px; height: 36px;
-            background: linear-gradient(135deg, var(--azul-bright), var(--azul-escuro));
-            border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            font-size: 14px; font-weight: 700; color: #fff; flex-shrink: 0;
+       .user-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    border-radius: 12px;
+    background: transparent;
+}
+.user-avatar {
+    width: 36px; height: 36px;
+    background: linear-gradient(135deg, var(--azul-bright), var(--azul-escuro));
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 700; color: #fff; flex-shrink: 0;
+}
+       .user-info-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: #0097dd;
         }
-        .user-info-name { font-size: 13px; font-weight: 600; color: var(--texto-cor); }
-        .user-info-role { font-size: 11px; color: var(--muted); }
 
+        .user-info-role {
+            font-size: 11px;
+            color: var(--muted);
+        }
         .menu-toggle {
             display: none; position: fixed; top: 20px; left: 20px; z-index: 200;
             background: white; width: 44px; height: 44px; border-radius: 12px;
@@ -432,9 +447,7 @@
 <aside class="sidebar" id="sidebar">
     <div class="sidebar-logo">
         <div class="logo-mark">
-            <div class="logo-icon">
-                <img src="skin.png" alt="Logo">
-            </div>
+<div class="logo-icon"><img src="pandas/skin.png" style="width:32px;height:32px;object-fit:contain;"></div>
             <span class="logo-text">Mindfine</span>
         </div>
     </div>
@@ -448,7 +461,7 @@
             <i data-lucide="bell"></i> Alertas
             <span class="nav-badge">3</span>
         </a>
-        <a href="intervencoes.html" class="nav-item active"><i data-lucide="target"></i> Intervenções</a>
+        <a href="intervencao.html" class="nav-item active"><i data-lucide="target"></i> Intervenções</a>
     </nav>
     <div class="sidebar-footer">
         <div class="user-card">
