@@ -33,15 +33,15 @@ O repositório contém as páginas HTML, arquivos de mídia (imagens e sons), sc
 
 ## Equipe
 
-|            Nome             |              Função             |
+|            Nome                 |              Função             |
 
-| Ana Luiza S. Meneses        | Desenvolvedora/ Lider do Projeto|
+| Ana Luiza S. Meneses            | Desenvolvedora/ Lider do Projeto|
 
-| Sarah F. Queiroz            | Desenvolvedora                  |
+| Sarah F. Queiroz                | Desenvolvedora                  |
 
-| Auriléia de O. Pereira      | Desenvolvedora                  |
+| Auriléia de O. Pereira          | Desenvolvedora                  |
 
-| Pamela Mickaelle de S. Costa| Desenvolvedora                  |
+| Pamela Mickaelle de S. Costa   | Desenvolvedora                  |
 
 ## Instituição
 
