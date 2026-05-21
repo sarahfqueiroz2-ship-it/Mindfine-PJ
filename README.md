@@ -4,7 +4,7 @@ Sistema web voltado ao apoio à saúde mental e bem-estar emocional, desenvolvid
 
 ## Sobre o Projeto
 
-O Mindfine é uma plataforma digital que oferece ferramentas lúdicas e terapêuticas para alunos. O sistema busca promover o autoconhecimento emocional por meio de recursos interativos, contribuindo para o desenvolvimento saudável dos usuários.
+O Mindfine é uma plataforma digital que oferece ferramentas lúdicas e terapêuticas para os alunos. O sistema busca promover o autoconhecimento emocional por meio de recursos interativos, contribuindo para o desenvolvimento saudável dos usuários.
 
 <img width="959" height="905" alt="image" src="https://github.com/user-attachments/assets/2d179428-c640-4ba6-acef-e4832be56dc9" />
 
