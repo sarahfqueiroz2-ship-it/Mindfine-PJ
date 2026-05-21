@@ -1,0 +1,1025 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mindfine — Relatórios</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        :root {
+            --azul-bright: #32B5F1;
+            --azul-escuro: #0277bd;
+            --texto-cor: #1e293b;
+            --muted: #64748b;
+            --surface: #ffffff;
+            --surface2: #f1f9ff;
+            --border: rgba(0,0,0,0.08);
+            --happy: #fbbf24;
+            --calm: #34d399;
+            --sad: #60a5fa;
+            --anxious: #8b5cf6;
+            --alert: #ef4444;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: #000;
+            min-height: 100vh;
+            overflow-x: hidden;
+            color: var(--texto-cor);
+        }
+
+        /* ── FUNDO ── */
+        .background-layer {
+            position: fixed;
+            width: 110%; height: 110%;
+            background-image: url('fundo-a.png');
+            background-size: cover;
+            background-position: center;
+            z-index: 1;
+            left: -5%; top: -5%;
+            filter: blur(8px) brightness(0.6);
+        }
+
+        /* ── PARTÍCULAS ── */
+        #particles-container {
+            position: fixed; top: 0; left: 0;
+            width: 100%; height: 100%;
+            pointer-events: none; z-index: 2;
+        }
+        .bubble {
+            position: absolute; bottom: -20px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            animation: rise linear forwards;
+        }
+        @keyframes rise { to { transform: translateY(-110vh); opacity: 0; } }
+
+        /* ── SIDEBAR ── */
+        .sidebar {
+            position: fixed; left: 0; top: 0;
+            width: 240px; height: 100vh;
+            background: rgba(255,255,255,0.92);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid var(--border);
+            display: flex; flex-direction: column;
+            z-index: 100; padding: 32px 0;
+        }
+        .sidebar-logo {
+            padding: 0 24px 32px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 16px;
+        }
+        .logo-mark { display: flex; align-items: center; gap: 10px; }
+        .logo-icon {
+    width: 36px;
+    height: 36px;
+    background: linear-gradient(135deg, var(--azul-bright), var(--azul-escuro));
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.logo-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 10px;
+}
+        .logo-text {
+            font-weight: 800; font-size: 18px;
+            background: linear-gradient(90deg, var(--azul-bright), var(--azul-escuro));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .sidebar-nav {
+            flex: 1; padding: 0 12px;
+            display: flex; flex-direction: column; gap: 4px;
+        }
+        .nav-section-label {
+            font-size: 10px; font-weight: 800; color: var(--muted);
+            text-transform: uppercase; letter-spacing: 0.12em;
+            padding: 16px 12px 8px;
+        }
+        .nav-item {
+            display: flex; align-items: center; gap: 12px;
+            padding: 12px 16px; border-radius: 10px;
+            color: #64748b; font-size: 14px; font-weight: 600;
+            cursor: pointer; transition: all 0.2s ease;
+            text-decoration: none; position: relative; margin-bottom: 4px;
+        }
+        .nav-item:hover { background: #f1f5f9; color: var(--azul-bright); }
+        .nav-item.active { background: #e3f2fd; color: var(--azul-escuro); font-weight: 800; }
+        .nav-item.active::before {
+            content: ''; position: absolute;
+            left: 0; top: 50%; transform: translateY(-50%);
+            width: 3px; height: 18px;
+            background: var(--azul-bright); border-radius: 0 2px 2px 0;
+        }
+        .nav-badge {
+            margin-left: auto; background: #b8d1ff; color: #0059ff;
+            font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 20px;
+        }
+        .sidebar-footer {
+            padding: 16px 12px 0;
+            border-top: 1px solid var(--border); margin-top: 8px;
+        }
+        .user-card {
+            display: flex; align-items: center; gap: 12px;
+            padding: 12px; border-radius: 12px; background: var(--surface2);
+        }
+        .user-avatar {
+            width: 36px; height: 36px;
+            background: linear-gradient(135deg, var(--azul-bright), var(--azul-escuro));
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-size: 14px; font-weight: 700; color: #fff; flex-shrink: 0;
+        }
+        .user-info-name { font-size: 13px; font-weight: 600; color: var(--texto-cor); }
+        .user-info-role { font-size: 11px; color: var(--muted); }
+
+        /* ── MENU TOGGLE ── */
+        .menu-toggle {
+            display: none; position: fixed; top: 20px; left: 20px; z-index: 200;
+            background: white; width: 44px; height: 44px; border-radius: 12px;
+            cursor: pointer; align-items: center; justify-content: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3); border: none; font-size: 18px;
+        }
+
+        /* ── MAIN ── */
+        .main-content {
+            position: relative; z-index: 10;
+            margin-left: 240px; padding: 40px 32px; min-height: 100vh;
+        }
+
+        /* ── FADE IN ── */
+        .fade-in { opacity: 0; transform: translateY(16px); animation: fadeInUp 0.5s ease forwards; }
+        @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
+        .d1 { animation-delay: 0.05s; }
+        .d2 { animation-delay: 0.10s; }
+        .d3 { animation-delay: 0.15s; }
+        .d4 { animation-delay: 0.20s; }
+        .d5 { animation-delay: 0.25s; }
+        .d6 { animation-delay: 0.30s; }
+
+        /* ── HEADER ── */
+        .page-header {
+            background: white; color: var(--azul-escuro);
+            padding: 25px 30px; border-radius: 20px;
+            margin-bottom: 30px; box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            display: flex; align-items: center; justify-content: space-between;
+            flex-wrap: wrap; gap: 16px;
+        }
+        .header-left h1 {
+            font-size: 24px; font-weight: 800; text-transform: uppercase;
+            margin-bottom: 4px; color: var(--azul-escuro);
+        }
+        .header-left h1 span {
+            background: linear-gradient(90deg, var(--azul-bright), var(--azul-escuro));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .header-left p { font-size: 14px; color: #666; font-weight: 600; }
+        .header-right { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+
+        /* ── BOTÕES ── */
+        .btn-primary {
+            background: linear-gradient(135deg, var(--azul-bright), var(--azul-escuro));
+            color: #fff; border: none; padding: 10px 20px; border-radius: 10px;
+            font-family: 'Montserrat', sans-serif; font-size: 13px; font-weight: 700;
+            cursor: pointer; transition: all 0.2s;
+        }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(50,181,241,0.4); }
+        .btn-ghost {
+            background: white; color: #64748b; border: 2px solid #e2e8f0;
+            padding: 10px 18px; border-radius: 10px;
+            font-family: 'Montserrat', sans-serif; font-size: 13px; font-weight: 600;
+            cursor: pointer; transition: all 0.2s;
+        }
+        .btn-ghost:hover { border-color: var(--azul-bright); color: var(--azul-bright); }
+
+        /* ── FILTROS ── */
+        .filters-bar {
+            background: white; border-radius: 20px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+            padding: 20px 24px; margin-bottom: 28px;
+            display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+        }
+        .filter-group { display: flex; flex-direction: column; gap: 6px; }
+        .filter-label { font-size: 10px; font-weight: 800; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; }
+        .filter-select {
+            border: 2px solid #f0f0f0; border-radius: 10px;
+            font-family: 'Montserrat', sans-serif; font-weight: 600;
+            font-size: 13px; padding: 8px 12px; color: var(--texto-cor);
+            background: #f8fafc; cursor: pointer; outline: none;
+            transition: border-color 0.2s;
+        }
+        .filter-select:focus { border-color: var(--azul-bright); }
+        .filter-divider { width: 1px; height: 40px; background: #f0f0f0; align-self: center; }
+
+        /* ── KPI STRIP ── */
+        .kpi-strip {
+            display: grid; grid-template-columns: repeat(4, 1fr);
+            gap: 20px; margin-bottom: 28px;
+        }
+        .kpi-card {
+            background: white; border-radius: 20px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+            padding: 22px 24px; transition: all 0.3s;
+            display: flex; align-items: center; gap: 16px;
+        }
+        .kpi-card:hover { transform: translateY(-4px); box-shadow: 0 18px 35px rgba(0,0,0,0.2); }
+        .kpi-icon {
+            width: 48px; height: 48px; border-radius: 14px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 22px; flex-shrink: 0;
+        }
+        .kpi-icon.blue   { background: rgba(50,181,241,0.12); }
+        .kpi-icon.green  { background: rgba(52,211,153,0.12); }
+        .kpi-icon.yellow { background: rgba(251,191,36,0.12); }
+        .kpi-icon.red    { background: rgba(239,68,68,0.12); }
+        .kpi-value { font-size: 30px; font-weight: 800; color: var(--azul-escuro); line-height: 1; }
+        .kpi-label { font-size: 11px; color: var(--muted); font-weight: 800; text-transform: uppercase; margin-top: 2px; }
+        .kpi-delta { font-size: 11px; font-weight: 800; margin-top: 4px; }
+        .kpi-delta.up   { color: #10b981; }
+        .kpi-delta.down { color: var(--alert); }
+        .kpi-delta.flat { color: var(--muted); }
+
+        /* ── GRID DE SEÇÕES ── */
+        .section-grid {
+            display: grid; grid-template-columns: 1fr 1fr;
+            gap: 24px; margin-bottom: 24px;
+        }
+        .section-grid.wide { grid-template-columns: 1fr; }
+        .section-grid.three { grid-template-columns: 1fr 1fr 1fr; }
+
+        .card {
+            background: white; border-radius: 20px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+            padding: 24px; transition: 0.3s ease;
+        }
+        .card:hover { transform: translateY(-3px); }
+
+        .card-title {
+            font-size: 16px; font-weight: 800; color: var(--azul-escuro);
+            text-transform: uppercase; margin-bottom: 20px;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .card-title span { font-size: 18px; }
+
+        /* ── BARRAS EMOCIONAIS ── */
+        .emotion-row {
+            display: flex; align-items: center; gap: 12px; margin-bottom: 14px;
+        }
+        .emotion-emoji { font-size: 20px; width: 28px; text-align: center; }
+        .emotion-label { font-size: 13px; font-weight: 800; color: var(--texto-cor); width: 70px; }
+        .bar-track { flex: 1; height: 14px; background: #f0f4f8; border-radius: 8px; overflow: hidden; }
+        .bar-fill-anim { height: 100%; border-radius: 8px; transition: width 1.2s cubic-bezier(.4,0,.2,1); }
+        .bar-fill-anim.happy   { background: linear-gradient(90deg,#fbbf24,#f59e0b); }
+        .bar-fill-anim.calm    { background: linear-gradient(90deg,#34d399,#10b981); }
+        .bar-fill-anim.sad     { background: linear-gradient(90deg,#38bdf8,#0ea5e9); }
+        .bar-fill-anim.anxious { background: linear-gradient(90deg,#a855f7,#9333ea); }
+        .bar-pct { font-size: 13px; font-weight: 800; color: var(--azul-escuro); width: 36px; text-align: right; }
+
+        /* ── TENDÊNCIA SEMANAL ── */
+        .trend-chart { display: flex; align-items: flex-end; gap: 8px; height: 120px; padding-top: 20px; }
+        .trend-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+        .trend-bar-v {
+            width: 100%; border-radius: 6px 6px 0 0;
+            background: linear-gradient(180deg, var(--azul-bright), #0277bd);
+            transition: height 1s ease; position: relative;
+        }
+        .trend-bar-v.dim { background: #dbe9f5; }
+        .trend-val { position: absolute; top: -20px; left: 50%; transform: translateX(-50%); font-size: 10px; font-weight: 800; color: var(--azul-escuro); white-space: nowrap; }
+        .trend-day-lbl { font-size: 10px; font-weight: 800; color: var(--muted); }
+
+        /* ── RANKING DE TURMAS ── */
+        .rank-row {
+            display: flex; align-items: center; gap: 14px;
+            padding: 12px 0; border-bottom: 1px solid #f0f4f8;
+        }
+        .rank-row:last-child { border-bottom: none; }
+        .rank-num { font-size: 18px; font-weight: 800; color: #dbe9f5; width: 28px; text-align: center; }
+        .rank-num.gold   { color: #f59e0b; }
+        .rank-num.silver { color: #94a3b8; }
+        .rank-num.bronze { color: #b45309; }
+        .rank-accent { width: 5px; height: 36px; border-radius: 4px; flex-shrink: 0; }
+        .rank-info { flex: 1; }
+        .rank-name { font-size: 14px; font-weight: 800; color: var(--texto-cor); }
+        .rank-sub  { font-size: 11px; color: var(--muted); font-weight: 600; }
+        .rank-score { font-size: 20px; font-weight: 800; }
+        .rank-bar-wrap { width: 100px; }
+        .rank-bar-track { height: 6px; background: #f0f4f8; border-radius: 4px; overflow: hidden; }
+        .rank-bar-fill  { height: 100%; border-radius: 4px; transition: width 1.2s ease; }
+
+        /* ── ALERTAS ── */
+        .alert-item {
+            display: flex; align-items: flex-start; gap: 14px;
+            padding: 14px 16px; border-radius: 14px;
+            margin-bottom: 10px; background: #fff8f8;
+            border: 1px solid rgba(239,68,68,0.15);
+        }
+        .alert-item.warn  { background: #fffbeb; border-color: rgba(251,191,36,0.25); }
+        .alert-item.info  { background: #f0f9ff; border-color: rgba(50,181,241,0.2); }
+        .alert-icon { font-size: 20px; flex-shrink: 0; margin-top: 1px; }
+        .alert-text { font-size: 13px; font-weight: 600; color: var(--texto-cor); line-height: 1.5; }
+        .alert-text strong { font-weight: 800; }
+        .alert-time { font-size: 10px; color: var(--muted); font-weight: 600; margin-top: 2px; }
+
+        /* ── PARTICIPAÇÃO ── */
+        .participation-grid {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;
+        }
+        .part-chip {
+            background: #f8fafc; border-radius: 14px; padding: 16px;
+            text-align: center; border: 1px solid #f0f0f0; transition: 0.2s;
+        }
+        .part-chip:hover { border-color: rgba(50,181,241,0.3); }
+        .part-chip-val { font-size: 26px; font-weight: 800; color: var(--azul-escuro); }
+        .part-chip-label { font-size: 10px; font-weight: 800; color: var(--muted); text-transform: uppercase; margin-top: 2px; }
+        .part-chip-sub { font-size: 11px; font-weight: 600; color: var(--muted); margin-top: 2px; }
+
+        /* ── HISTÓRICO MENSAL ── */
+        .monthly-row {
+            display: flex; align-items: center; gap: 12px;
+            padding: 10px 0; border-bottom: 1px solid #f0f4f8;
+        }
+        .monthly-row:last-child { border-bottom: none; }
+        .monthly-month { font-size: 13px; font-weight: 800; color: var(--texto-cor); width: 60px; }
+        .monthly-bar-track { flex: 1; height: 10px; background: #f0f4f8; border-radius: 6px; overflow: hidden; }
+        .monthly-bar-fill  { height: 100%; border-radius: 6px; transition: width 1.2s ease;
+            background: linear-gradient(90deg, var(--azul-bright), var(--azul-escuro)); }
+        .monthly-val { font-size: 13px; font-weight: 800; color: var(--azul-escuro); width: 30px; text-align: right; }
+        .monthly-badge { font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 20px; flex-shrink: 0; }
+        .monthly-badge.up   { background: rgba(52,211,153,0.12); color: #10b981; }
+        .monthly-badge.down { background: rgba(239,68,68,0.10); color: #ef4444; }
+        .monthly-badge.same { background: rgba(100,116,139,0.10); color: var(--muted); }
+
+        /* ── TABELA CURSOS ── */
+        .curso-table { width: 100%; border-collapse: collapse; }
+        .curso-table th {
+            font-size: 10px; font-weight: 800; color: var(--muted);
+            text-transform: uppercase; letter-spacing: 0.08em;
+            text-align: left; padding: 0 0 12px; border-bottom: 2px solid #f0f4f8;
+        }
+        .curso-table td {
+            padding: 12px 0; border-bottom: 1px solid #f0f4f8;
+            font-size: 13px; font-weight: 600; color: var(--texto-cor);
+        }
+        .curso-table tr:last-child td { border-bottom: none; }
+        .curso-table .score-cell { font-weight: 800; }
+        .score-high { color: #10b981; }
+        .score-mid  { color: #f59e0b; }
+        .score-low  { color: #ef4444; }
+        .curso-tag {
+            font-size: 10px; font-weight: 800; padding: 3px 10px; border-radius: 20px;
+        }
+        .curso-tag.info  { background: rgba(50,181,241,0.1); color: var(--azul-bright); }
+        .curso-tag.adm   { background: rgba(52,211,153,0.1); color: #10b981; }
+        .curso-tag.meio  { background: rgba(139,92,246,0.1); color: #8b5cf6; }
+
+        /* ── MOBILE ── */
+        @media (max-width: 1100px) {
+            .kpi-strip { grid-template-columns: 1fr 1fr; }
+            .section-grid.three { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 900px) {
+            .section-grid { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 768px) {
+            .sidebar { transform: translateX(-100%); transition: 0.3s; }
+            .sidebar.open { transform: translateX(0); }
+            .menu-toggle { display: flex; }
+            .main-content { margin-left: 0; padding: 72px 16px 32px; }
+            .kpi-strip { grid-template-columns: 1fr 1fr; }
+            .participation-grid { grid-template-columns: 1fr 1fr; }
+        }
+
+       .nav-item i {
+    width: 20px;
+    height: 20px;
+    stroke-width: 2;
+    flex-shrink: 0;
+}
+.btn-primary i, .btn-ghost i, .kpi-icon i, .card-title i, .alert-icon i {
+    width: 16px; height: 16px; flex-shrink: 0;
+}
+.kpi-icon i { width: 22px; height: 22px; }
+    </style>
+</head>
+<body>
+
+<div class="background-layer"></div>
+<div id="particles-container"></div>
+
+<!-- ── SIDEBAR ── -->
+<aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+        <div class="logo-mark">
+            <div class="logo-icon">
+                <img src="skin.png" alt="Logo">
+            </div>
+            <span class="logo-text">Mindfine</span>
+        </div>
+    </div>
+    <nav class="sidebar-nav">
+        <div class="nav-section-label">Principal</div>
+        <a href="inicio-escola.html" class="nav-item"><i data-lucide="layout-dashboard"></i> Painel Geral</a>
+        <a href="turma.html"   class="nav-item"><i data-lucide="users"></i> Turmas</a>
+        <a href="relatorio.html"    class="nav-item active"><i data-lucide="trending-up"></i> Relatórios</a>
+        <div class="nav-section-label">Gestão</div>
+        <a href="alertas.html" class="nav-item">
+           <i data-lucide="bell"></i> Alertas
+            <span class="nav-badge">3</span>
+        </a>
+        <a href="intervencao.html" class="nav-item"><i data-lucide="target"></i> Intervenções</a>
+    </nav>
+    <div class="sidebar-footer">
+        <div class="user-card">
+            <div class="user-avatar">EP</div>
+            <div>
+                <div class="user-info-name">Escola Painel</div>
+                <div class="user-info-role">Administrador</div>
+            </div>
+        </div>
+        <a href="login.html" class="nav-item" style="color:#f87171;margin-top:8px;">
+            <i data-lucide="log-out"></i> Sair
+        </a>
+    </div>
+</aside>
+
+<button class="menu-toggle" id="menuToggle"><i data-lucide="menu"></i></button>
+
+<!-- ── MAIN ── -->
+<main class="main-content">
+
+    <!-- Header -->
+    <div class="page-header fade-in">
+        <div class="header-left">
+            <h1>Relatórios de <span>Bem-Estar</span></h1>
+            <p>Análise consolidada · atualizado hoje às 08:42</p>
+        </div>
+        <div class="header-right">
+          <button class="btn-ghost" onclick="exportarCSV()">
+    <i data-lucide="file-text"></i> Exportar CSV
+</button>
+<button class="btn-primary" onclick="exportarRelatorio()">
+    <i data-lucide="table-2"></i> Exportar Excel
+</button>
+        </div>
+    </div>
+
+    <!-- Filtros -->
+    <div class="filters-bar fade-in d1">
+        <div class="filter-group">
+            <label class="filter-label">Período</label>
+            <select class="filter-select" id="fPeriodo" onchange="atualizar()">
+                <option value="semana">Esta Semana</option>
+                <option value="mes" selected>Este Mês</option>
+                <option value="trimestre">Trimestre</option>
+                <option value="ano">Ano Letivo</option>
+            </select>
+        </div>
+        <div class="filter-divider"></div>
+        <div class="filter-group">
+            <label class="filter-label">Curso</label>
+            <select class="filter-select" id="fCurso" onchange="atualizar()">
+                <option value="todos">Todos os Cursos</option>
+                <option value="adm">Administração</option>
+                <option value="inf">Informática</option>
+                <option value="ma">Meio Ambiente</option>
+            </select>
+        </div>
+        <div class="filter-divider"></div>
+        <div class="filter-group">
+            <label class="filter-label">Ano Escolar</label>
+            <select class="filter-select" id="fAno" onchange="atualizar()">
+                <option value="todos">Todos os Anos</option>
+                <option value="1">1º Ano</option>
+                <option value="2">2º Ano</option>
+                <option value="3">3º Ano</option>
+            </select>
+        </div>
+        <div class="filter-divider"></div>
+        <div class="filter-group">
+            <label class="filter-label">Turno</label>
+            <select class="filter-select" id="fTurno" onchange="atualizar()">
+                <option value="todos">Manhã e Tarde</option>
+                <option value="manha">Manhã</option>
+                <option value="tarde">Tarde</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- KPIs -->
+    <div class="kpi-strip fade-in d2">
+        <div class="kpi-card">
+            <div class="kpi-icon blue"><i data-lucide="activity"></i></div>
+
+            <div>
+                <div class="kpi-value" id="kpiWellbeing">7.4</div>
+                <div class="kpi-label">Bem-estar Médio</div>
+                <div class="kpi-delta up" id="kpiWellbeingDelta">▲ +0.3 vs mês ant.</div>
+            </div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-icon green"><i data-lucide="graduation-cap"></i></div>
+
+            <div>
+                <div class="kpi-value" id="kpiParticipacao">89%</div>
+                <div class="kpi-label">Participação</div>
+                <div class="kpi-delta up" id="kpiParticipacaoDelta">▲ +4% vs mês ant.</div>
+            </div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-icon yellow"><i data-lucide="smile"></i></div>
+
+            <div>
+                <div class="kpi-value" id="kpiFelizes">43%</div>
+                <div class="kpi-label">Alunos Felizes</div>
+                <div class="kpi-delta up" id="kpiFelizesDelta">▲ +5% vs mês ant.</div>
+            </div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-icon red"><i data-lucide="alert-triangle"></i></div>
+
+            <div>
+                <div class="kpi-value" id="kpiAlertas">15</div>
+                <div class="kpi-label">Alertas Ativos</div>
+                <div class="kpi-delta down" id="kpiAlertasDelta">▼ +3 vs mês ant.</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Linha 1: Emoções + Tendência Semanal -->
+    <div class="section-grid fade-in d3">
+
+        <div class="card">
+<div class="card-title"><i data-lucide="heart"></i> Distribuição Emocional</div>
+            <div class="emotion-row">
+                <span class="emotion-emoji">😊</span>
+                <span class="emotion-label">Feliz</span>
+                <div class="bar-track"><div class="bar-fill-anim happy" data-w="43" style="width:0%"></div></div>
+                <span class="bar-pct">43%</span>
+            </div>
+            <div class="emotion-row">
+                <span class="emotion-emoji">😌</span>
+                <span class="emotion-label">Calmo</span>
+                <div class="bar-track"><div class="bar-fill-anim calm" data-w="29" style="width:0%"></div></div>
+                <span class="bar-pct">29%</span>
+            </div>
+            <div class="emotion-row">
+                <span class="emotion-emoji">😢</span>
+                <span class="emotion-label">Triste</span>
+                <div class="bar-track"><div class="bar-fill-anim sad" data-w="16" style="width:0%"></div></div>
+                <span class="bar-pct">16%</span>
+            </div>
+            <div class="emotion-row">
+                <span class="emotion-emoji">😰</span>
+                <span class="emotion-label">Ansioso</span>
+                <div class="bar-track"><div class="bar-fill-anim anxious" data-w="12" style="width:0%"></div></div>
+                <span class="bar-pct">12%</span>
+            </div>
+            <div style="margin-top:20px;padding-top:16px;border-top:1px solid #f0f4f8;">
+                <div style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;margin-bottom:10px;">Índice de Bem-Estar por Emoção</div>
+                <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                    <span style="font-size:12px;font-weight:800;padding:4px 12px;border-radius:20px;background:rgba(251,191,36,0.12);color:#f59e0b;">Feliz → 8.5</span>
+                    <span style="font-size:12px;font-weight:800;padding:4px 12px;border-radius:20px;background:rgba(52,211,153,0.12);color:#10b981;">Calmo → 7.8</span>
+                    <span style="font-size:12px;font-weight:800;padding:4px 12px;border-radius:20px;background:rgba(96,165,250,0.12);color:#3b82f6;">Triste → 5.2</span>
+                    <span style="font-size:12px;font-weight:800;padding:4px 12px;border-radius:20px;background:rgba(168,85,247,0.12);color:#a855f7;">Ansioso → 4.8</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+<div class="card-title"><i data-lucide="calendar-days"></i> Tendência Semanal</div>
+            <div class="trend-chart" id="trendChart"></div>
+            <div style="display:flex;justify-content:space-between;margin-top:12px;padding-top:12px;border-top:1px solid #f0f4f8;">
+                <div>
+                    <div style="font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;">Mínimo</div>
+                    <div style="font-size:16px;font-weight:800;color:#ef4444;">6.1</div>
+                </div>
+                <div style="text-align:center;">
+                    <div style="font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;">Média</div>
+                    <div style="font-size:16px;font-weight:800;color:var(--azul-escuro);">7.4</div>
+                </div>
+                <div style="text-align:right;">
+                    <div style="font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;">Máximo</div>
+                    <div style="font-size:16px;font-weight:800;color:#10b981;">8.6</div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Linha 2: Ranking + Alertas -->
+    <div class="section-grid fade-in d4">
+
+        <div class="card">
+<div class="card-title"><i data-lucide="trophy"></i> Ranking de Turmas</div>
+            <div id="rankingContainer"></div>
+        </div>
+
+        <div class="card">
+<div class="card-title"><i data-lucide="bell"></i> Alertas Recentes</div>
+<div class="alert-item" onclick="window.location='alertas.html'" style="cursor:pointer;">
+<span class="alert-icon"><i data-lucide="alert-circle" style="width:20px;height:20px;color:#ef4444"></i></span>
+                <div>
+                    <div class="alert-text"><strong>2° ADM</strong> — 3 alunos com bem-estar abaixo de 4.0 por mais de 5 dias consecutivos.</div>
+                    <div class="alert-time">Hoje · 08:15</div>
+                </div>
+            </div>
+<div class="alert-item" onclick="window.location='alertas.html'" style="cursor:pointer;">
+<span class="alert-icon"><i data-lucide="alert-circle" style="width:20px;height:20px;color:#ef4444"></i></span>
+                <div>
+                    <div class="alert-text"><strong>1° MA</strong> — Pico de ansiedade detectado: 27% da turma relatou ansiedade hoje.</div>
+                    <div class="alert-time">Hoje · 07:50</div>
+                </div>
+            </div>
+<div class="alert-item warn" onclick="window.location='alertas.html'" style="cursor:pointer;">
+<span class="alert-icon"><i data-lucide="alert-triangle" style="width:20px;height:20px;color:#f59e0b"></i></span>
+                <div>
+                    <div class="alert-text"><strong>2° MA</strong> — Bem-estar médio caiu 1.2 pontos em relação à semana passada.</div>
+                    <div class="alert-time">Ontem · 16:30</div>
+                </div>
+            </div>
+<div class="alert-item warn" onclick="window.location='alertas.html'" style="cursor:pointer;">
+<span class="alert-icon"><i data-lucide="alert-triangle" style="width:20px;height:20px;color:#f59e0b"></i></span>
+                <div>
+                    <div class="alert-text"><strong>3° ADM</strong> — 2 alunos com padrão de tristeza recorrente. Acompanhamento sugerido.</div>
+                    <div class="alert-time">Ontem · 14:00</div>
+                </div>
+            </div>
+<div class="alert-item info" onclick="window.location='alertas.html'" style="cursor:pointer;">
+<span class="alert-icon"><i data-lucide="info" style="width:20px;height:20px;color:#32B5F1"></i></span>
+                <div>
+                    <div class="alert-text"><strong>1° INF</strong> — Participação subiu para 96%. Turma mais engajada da semana.</div>
+                    <div class="alert-time">Ontem · 10:20</div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Linha 3: Histórico mensal + Participação + Cursos -->
+    <div class="section-grid three fade-in d5">
+
+        <div class="card">
+<div class="card-title"><i data-lucide="calendar"></i> Histórico Mensal</div>
+            <div id="monthlyChart"></div>
+        </div>
+
+        <div class="card">
+<div class="card-title"><i data-lucide="check-circle"></i> Participação por Turma</div>
+            <div class="participation-grid" id="participacaoGrid"></div>
+        </div>
+
+        <div class="card">
+<div class="card-title"><i data-lucide="graduation-cap"></i> Bem-Estar por Curso</div>
+            <table class="curso-table">
+                <thead>
+                    <tr>
+                        <th>Curso</th>
+                        <th>Turmas</th>
+                        <th>Alunos</th>
+                        <th>Score</th>
+                        <th>Alertas</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="curso-tag adm">Administração</span></td>
+                        <td>3</td><td>72</td>
+                        <td class="score-cell score-mid">7.4</td>
+                        <td style="color:#ef4444;font-weight:800;">5</td>
+                    </tr>
+                    <tr>
+                        <td><span class="curso-tag info">Informática</span></td>
+                        <td>3</td><td>66</td>
+                        <td class="score-cell score-high">7.5</td>
+                        <td style="color:#f59e0b;font-weight:800;">3</td>
+                    </tr>
+                    <tr>
+                        <td><span class="curso-tag meio">Meio Ambiente</span></td>
+                        <td>3</td><td>69</td>
+                        <td class="score-cell score-low">5.8</td>
+                        <td style="color:#ef4444;font-weight:800;">9</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div style="margin-top:20px;padding-top:16px;border-top:1px solid #f0f4f8;">
+                <div style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;margin-bottom:10px;">Destaque do Período</div>
+                <div style="background:#f0fdf4;border:1px solid rgba(52,211,153,0.3);border-radius:12px;padding:12px 14px;">
+<div style="font-size:13px;font-weight:800;color:#10b981;">Administração (1° Ano) — Melhor desempenho</div>
+<div style="font-size:12px;font-weight:600;color:var(--muted);margin-top:2px;">Score 8.5 · 0 alertas · 96% participação</div>
+                </div>
+                <div style="background:#fff8f8;border:1px solid rgba(239,68,68,0.2);border-radius:12px;padding:12px 14px;margin-top:8px;">
+<div style="font-size:13px;font-weight:800;color:#ef4444;">Meio Ambiente — Atenção</div>
+                    <div style="font-size:12px;font-weight:600;color:var(--muted);margin-top:2px;">Score médio 5.8 · 9 alertas ativos</div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Recomendações -->
+    <div class="card fade-in d6" style="margin-bottom:32px;">
+<div class="card-title"><i data-lucide="lightbulb"></i> Recomendações para o Próximo Período</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;" id="recsGrid"></div>
+    </div>
+
+</main>
+
+<script>
+/* ── BOLHAS ── */
+function createBubble() {
+    const c = document.getElementById('particles-container');
+    const b = document.createElement('div');
+    b.className = 'bubble';
+    const size = Math.random() * 20 + 5;
+    b.style.width = b.style.height = size + 'px';
+    b.style.left = Math.random() * 100 + '%';
+    b.style.animationDuration = (Math.random() * 5 + 8) + 's';
+    c.appendChild(b);
+    setTimeout(() => b.remove(), 10000);
+}
+setInterval(createBubble, 1500);
+
+/* ── SIDEBAR TOGGLE ── */
+document.getElementById('menuToggle').addEventListener('click', () => {
+    document.getElementById('sidebar').classList.toggle('open');
+});
+
+/* ── DADOS ── */
+const trendData = [
+    { day: 'Seg', val: 7.1 },
+    { day: 'Ter', val: 6.8 },
+    { day: 'Qua', val: 7.4 },
+    { day: 'Qui', val: 7.9 },
+    { day: 'Sex', val: 8.1 },
+    { day: 'Sáb', val: 6.1 },
+    { day: 'Dom', val: 8.6 },
+];
+
+const turmas = [
+    { nome:'1° ADM', curso:'Administração', cursoCod:'adm', score:8.5, alertas:0, color:'linear-gradient(90deg,#34d399,#10b981)' },
+    { nome:'1° INF', curso:'Informática',   cursoCod:'inf', score:8.2, alertas:1, color:'linear-gradient(90deg,#32B5F1,#60a5fa)' },
+    { nome:'3° ADM', curso:'Administração', cursoCod:'adm', score:7.9, alertas:2, color:'linear-gradient(90deg,#fbbf24,#f59e0b)' },
+    { nome:'3° INF', curso:'Informática',   cursoCod:'inf', score:7.4, alertas:0, color:'linear-gradient(90deg,#2dd4bf,#0d9488)' },
+    { nome:'2° INF', curso:'Informática',   cursoCod:'inf', score:6.9, alertas:2, color:'linear-gradient(90deg,#a78bfa,#8b5cf6)' },
+    { nome:'2° ADM', curso:'Administração', cursoCod:'adm', score:5.8, alertas:3, color:'linear-gradient(90deg,#f87171,#ef4444)' },
+    { nome:'1° MA',  curso:'Meio Ambiente', cursoCod:'ma',  score:5.8, alertas:3, color:'linear-gradient(90deg,#f87171,#ef4444)' },
+    { nome:'2° MA',  curso:'Meio Ambiente', cursoCod:'ma',  score:5.8, alertas:3, color:'linear-gradient(90deg,#f87171,#ef4444)' },
+    { nome:'3° MA',  curso:'Meio Ambiente', cursoCod:'ma',  score:5.8, alertas:3, color:'linear-gradient(90deg,#f87171,#ef4444)' },
+];
+
+
+const monthlyData = [
+    { month: 'Fev', val: 6.8, badge: 'same' },
+    { month: 'Mar', val: 7.0, badge: 'up' },
+    { month: 'Abr', val: 6.7, badge: 'down' },
+    { month: 'Mai', val: 7.4, badge: 'up' },
+];
+
+const participacaoData = [
+    { nome: '1° ADM', pct: 96 }, { nome: '1° INF', pct: 94 },
+    { nome: '3° ADM', pct: 91 }, { nome: '3° INF', pct: 88 },
+    { nome: '2° INF', pct: 85 }, { nome: '2° ADM', pct: 80 },
+    { nome: '1° MA',  pct: 82 }, { nome: '2° MA',  pct: 79 },
+    { nome: '3° MA',  pct: 88 },
+];
+
+const recsData = [
+    { icon: 'wind', title: 'Atividade de Relaxamento', desc: 'Aplicar técnica de respiração guiada nas turmas de Meio Ambiente antes das aulas. Alto índice de ansiedade detectado.', tag: 'Urgente', tagColor: '#ef4444' },
+    { icon: 'message-circle', title: 'Roda de Conversa', desc: 'Promover roda de conversa sobre pressão acadêmica para 2° ADM e 3° ADM antes das avaliações do trimestre.', tag: 'Recomendado', tagColor: '#f59e0b' },
+    { icon: 'award', title: 'Reconhecimento Positivo', desc: 'Parabenizar 1° ADM pelo excelente índice de bem-estar e engajamento. Compartilhar boas práticas com demais turmas.', tag: 'Positivo', tagColor: '#10b981' },
+{ icon: 'shield', title: 'Acompanhamento Psicológico', desc: 'Encaminhar alunos de 2° ADM com bem-estar crítico para suporte psicológico escolar. Acompanhamento individualizado interno.', tag: 'Urgente', tagColor: '#ef4444' },
+      { icon: 'gamepad-2', title: 'Gamificação do Bem-Estar', desc: 'Lançar desafio coletivo de bem-estar entre turmas para aumentar participação nas turmas com índice abaixo de 85%.', tag: 'Sugestão', tagColor: '#0277bd' },
+    { icon: 'bar-chart-2', title: 'Revisão de Carga Horária', desc: 'Conversar com coordenação sobre a carga de avaliações previstas para as turmas de 3° Ano no próximo mês.', tag: 'Planejamento', tagColor: '#6b7280' },
+];
+
+/* ── RENDERIZAÇÃO ── */
+function renderTrend() {
+    const maxVal = Math.max(...trendData.map(d => d.val));
+    document.getElementById('trendChart').innerHTML = trendData.map((d, i) => `
+        <div class="trend-col">
+            <div class="trend-bar-v ${i === trendData.length - 1 ? '' : (d.val >= 7.5 ? '' : 'dim')}"
+                 id="tb${i}" style="height:0%">
+                <span class="trend-val">${d.val}</span>
+            </div>
+            <span class="trend-day-lbl">${d.day}</span>
+        </div>
+    `).join('');
+    setTimeout(() => {
+        trendData.forEach((d, i) => {
+            const el = document.getElementById('tb' + i);
+            if (el) el.style.height = (d.val / maxVal * 100) + '%';
+        });
+    }, 200);
+}
+
+function renderRanking() {
+    const sorted = [...turmas].sort((a, b) => b.score - a.score);
+    document.getElementById('rankingContainer').innerHTML = sorted.map((t, i) => {
+        const numClass = i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : '';
+        const scoreClass = t.score >= 7.5 ? 'score-high' : t.score >= 6.0 ? 'score-mid' : 'score-low';
+     return `
+<div class="rank-row" onclick="window.location='turma.html'" style="cursor:pointer;">
+            <span class="rank-num ${numClass}">${i + 1}</span>
+            <div class="rank-accent" style="background:${t.color}"></div>
+            <div class="rank-info">
+                <div class="rank-name">${t.nome}</div>
+                <div class="rank-sub">${t.curso} · ${t.alertas} alerta${t.alertas !== 1 ? 's' : ''}</div>
+            </div>
+            <div class="rank-bar-wrap">
+                <div class="rank-bar-track">
+                    <div class="rank-bar-fill" data-w="${t.score / 10 * 100}"
+                         style="width:0%;background:${t.color}"></div>
+                </div>
+            </div>
+            <div class="rank-score ${scoreClass}">${t.score}</div>
+        </div>`;
+    }).join('');
+}
+
+function renderMonthly() {
+    const maxVal = Math.max(...monthlyData.map(d => d.val));
+    document.getElementById('monthlyChart').innerHTML = monthlyData.map(d => `
+        <div class="monthly-row">
+            <span class="monthly-month">${d.month}</span>
+            <div class="monthly-bar-track">
+                <div class="monthly-bar-fill" data-w="${d.val / maxVal * 100}" style="width:0%"></div>
+            </div>
+            <span class="monthly-val">${d.val}</span>
+            <span class="monthly-badge ${d.badge}">${d.badge === 'up' ? '▲ Alta' : d.badge === 'down' ? '▼ Queda' : '→ Estável'}</span>
+        </div>
+    `).join('');
+}
+
+function renderParticipacao() {
+    document.getElementById('participacaoGrid').innerHTML = participacaoData.map(p => `
+        <div class="part-chip">
+            <div class="part-chip-val" style="color:${p.pct >= 90 ? '#10b981' : p.pct >= 80 ? '#f59e0b' : '#ef4444'}">${p.pct}%</div>
+            <div class="part-chip-label">${p.nome}</div>
+            <div class="part-chip-sub">${p.pct >= 90 ? '✓ Excelente' : p.pct >= 80 ? '~ Regular' : '✗ Atenção'}</div>
+        </div>
+    `).join('');
+}
+
+function renderRecs() {
+    document.getElementById('recsGrid').innerHTML = recsData.map(r => `
+        <div style="background:#f8fafc;border:1px solid #f0f0f0;border-radius:16px;padding:18px;transition:0.2s;"
+             onmouseover="this.style.borderColor='rgba(50,181,241,0.3)'"
+             onmouseout="this.style.borderColor='#f0f0f0'">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+                <div style="width:32px;height:32px;border-radius:8px;background:${r.tagColor}18;display:flex;align-items:center;justify-content:center;color:${r.tagColor};flex-shrink:0;">
+    <i data-lucide="${r.icon}" style="width:16px;height:16px"></i>
+</div>
+                <span style="font-size:13px;font-weight:800;color:var(--texto-cor);">${r.title}</span>
+                <span style="margin-left:auto;font-size:10px;font-weight:800;padding:3px 10px;border-radius:20px;background:${r.tagColor}18;color:${r.tagColor};">${r.tag}</span>
+            </div>
+            <div style="font-size:12px;font-weight:600;color:var(--muted);line-height:1.6;">${r.desc}</div>
+        </div>
+    `).join('');
+
+    lucide.createIcons();
+}
+
+function animateBars() {
+    setTimeout(() => {
+        document.querySelectorAll('[data-w]').forEach(el => {
+            el.style.width = el.dataset.w + '%';
+        });
+        document.querySelectorAll('.bar-fill-anim[data-w]').forEach(el => {
+            el.style.width = el.dataset.w + '%';
+        });
+    }, 300);
+}
+
+function atualizar() {
+    const periodo  = document.getElementById('fPeriodo').value;
+    const curso    = document.getElementById('fCurso').value;
+    const ano      = document.getElementById('fAno').value;
+
+    // Filtra turmas
+    const turmasFiltradas = turmas.filter(t => {
+        const cursoOk = curso === 'todos' || t.cursoCod === curso;
+        const anoOk   = ano   === 'todos' || t.nome.startsWith(ano + '°');
+        return cursoOk && anoOk;
+    });
+
+    // Multiplicadores por período
+    const mult = { semana: 1.02, mes: 1, trimestre: 0.97, ano: 1.03 };
+    const m = mult[periodo] || 1;
+
+    // Recalcula KPIs
+    const scores       = turmasFiltradas.map(t => t.score);
+    const avgScore     = scores.length ? (scores.reduce((a,b) => a+b,0) / scores.length * m).toFixed(1) : '—';
+    const totalAlertas = turmasFiltradas.reduce((a,t) => a + t.alertas, 0);
+    const partData     = participacaoData.filter(p => {
+        const cursoOk = curso === 'todos' || turmasFiltradas.find(t => t.nome === p.nome);
+        const anoOk   = ano   === 'todos' || p.nome.startsWith(ano + '°');
+        return cursoOk && anoOk;
+    });
+    const avgPart = partData.length ? Math.round(partData.reduce((a,p) => a + p.pct, 0) / partData.length) : 0;
+    const pctFeliz = turmasFiltradas.length ? Math.min(99, Math.round(43 * m)) : 0;
+
+    // Atualiza KPIs na tela
+    document.getElementById('kpiWellbeing').textContent    = avgScore;
+    document.getElementById('kpiParticipacao').textContent = avgPart + '%';
+    document.getElementById('kpiFelizes').textContent      = pctFeliz + '%';
+    document.getElementById('kpiAlertas').textContent      = totalAlertas;
+
+    // Atualiza deltas
+    document.getElementById('kpiWellbeingDelta').textContent    = m >= 1 ? '▲ Alta no período' : '▼ Queda no período';
+    document.getElementById('kpiWellbeingDelta').className      = 'kpi-delta ' + (m >= 1 ? 'up' : 'down');
+    document.getElementById('kpiParticipacaoDelta').textContent  = avgPart >= 85 ? '▲ Acima da meta' : '▼ Abaixo da meta';
+    document.getElementById('kpiParticipacaoDelta').className    = 'kpi-delta ' + (avgPart >= 85 ? 'up' : 'down');
+    document.getElementById('kpiFelizesDelta').textContent       = pctFeliz >= 43 ? '▲ Acima da média' : '▼ Abaixo da média';
+    document.getElementById('kpiFelizesDelta').className         = 'kpi-delta ' + (pctFeliz >= 43 ? 'up' : 'down');
+    document.getElementById('kpiAlertasDelta').textContent       = totalAlertas <= 5 ? '✓ Dentro do esperado' : '▼ Acima do esperado';
+    document.getElementById('kpiAlertasDelta').className         = 'kpi-delta ' + (totalAlertas <= 5 ? 'up' : 'down');
+
+    // Atualiza ranking com turmas filtradas
+    const sorted = [...turmasFiltradas].sort((a,b) => b.score - a.score);
+    document.getElementById('rankingContainer').innerHTML = sorted.map((t, i) => {
+        const numClass   = i===0?'gold':i===1?'silver':i===2?'bronze':'';
+        const scoreClass = t.score>=7.5?'score-high':t.score>=6.0?'score-mid':'score-low';
+        return `
+        <div class="rank-row">
+            <span class="rank-num ${numClass}">${i+1}</span>
+            <div class="rank-accent" style="background:${t.color}"></div>
+            <div class="rank-info">
+                <div class="rank-name">${t.nome}</div>
+                <div class="rank-sub">${t.curso} · ${t.alertas} alerta${t.alertas!==1?'s':''}</div>
+            </div>
+            <div class="rank-bar-wrap">
+                <div class="rank-bar-track">
+                    <div class="rank-bar-fill" style="width:${t.score/10*100}%;background:${t.color}"></div>
+                </div>
+            </div>
+            <div class="rank-score ${scoreClass}">${t.score}</div>
+        </div>`;
+    }).join('') || '<div style="padding:20px;text-align:center;color:var(--muted);font-size:13px;font-weight:600;">Nenhuma turma encontrada</div>';
+
+    // Atualiza participação filtrada
+    document.getElementById('participacaoGrid').innerHTML = partData.map(p => `
+        <div class="part-chip">
+            <div class="part-chip-val" style="color:${p.pct>=90?'#10b981':p.pct>=80?'#f59e0b':'#ef4444'}">${p.pct}%</div>
+            <div class="part-chip-label">${p.nome}</div>
+            <div class="part-chip-sub">${p.pct>=90?'✓ Excelente':p.pct>=80?'~ Regular':'✗ Atenção'}</div>
+        </div>
+    `).join('') || '<div style="padding:20px;text-align:center;color:var(--muted);font-size:13px;font-weight:600;">Sem dados</div>';
+}
+
+function exportarCSV() {
+    const linhas = [['Turma','Curso','Score','Alertas','Participação']];
+    turmas.forEach(t => {
+        const part = participacaoData.find(p => p.nome === t.nome);
+        linhas.push([t.nome, t.curso, t.score, t.alertas, part ? part.pct + '%' : '—']);
+    });
+    const csv = linhas.map(l => l.join(',')).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href = url; a.download = 'relatorio-mindfine.csv'; a.click();
+    URL.revokeObjectURL(url);
+}
+
+function exportarRelatorio() {
+    const periodo = document.getElementById('fPeriodo').value;
+    const curso   = document.getElementById('fCurso').value;
+    const linhas  = [
+        ['RELATÓRIO MINDFINE'],
+        ['Período:', periodo, 'Curso:', curso],
+        [],
+        ['Turma','Curso','Score','Alertas','Participação'],
+    ];
+    turmas.forEach(t => {
+        const part = participacaoData.find(p => p.nome === t.nome);
+        linhas.push([t.nome, t.curso, t.score, t.alertas, part ? part.pct + '%' : '—']);
+    });
+    const csv = linhas.map(l => l.join(',')).join('\n');
+    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href = url; a.download = 'relatorio-mindfine.xls'; a.click();
+    URL.revokeObjectURL(url);
+}
+
+
+/* ── INIT ── */
+renderTrend();
+renderRanking();
+renderMonthly();
+renderParticipacao();
+renderRecs();
+animateBars();
+
+lucide.createIcons();
+</script>
+</body>
+</html>

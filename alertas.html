@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mindfine — Alertas</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
+   <script src="https://unpkg.com/lucide@latest"></script>
+   
+   <style>
+        :root {
+            --azul-bright: #32B5F1;
+            --azul-escuro: #0277bd;
+            --texto-cor: #1e293b;
+            --muted: #64748b;
+            --surface2: #f1f9ff;
+            --border: rgba(0,0,0,0.08);
+        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'Montserrat',sans-serif; background:#000; min-height:100vh; overflow-x:hidden; color:var(--texto-cor); }
+
+        /* FUNDO */
+        .background-layer {
+            position:fixed; width:110%; height:110%;
+            background-image:url('fundo-a.png');
+            background-size:cover; background-position:center;
+            z-index:1; left:-5%; top:-5%;
+            filter:blur(8px) brightness(0.6);
+        }
+
+        /* PARTÍCULAS */
+        #particles-container { position:fixed; inset:0; pointer-events:none; z-index:2; }
+        .bubble { position:absolute; bottom:-20px; background:rgba(255,255,255,0.2); border-radius:50%; animation:rise linear forwards; }
+        @keyframes rise { to { transform:translateY(-110vh); opacity:0; } }
+
+        /* SIDEBAR */
+        .sidebar {
+            position:fixed; left:0; top:0; width:240px; height:100vh;
+            background:rgba(255,255,255,0.92); backdrop-filter:blur(20px);
+            border-right:1px solid var(--border);
+            display:flex; flex-direction:column; z-index:100; padding:32px 0;
+        }
+        .sidebar-logo { padding:0 24px 32px; border-bottom:1px solid var(--border); margin-bottom:16px; }
+        .logo-mark { display:flex; align-items:center; gap:10px; }
+       .logo-icon {
+    width:36px; height:36px;
+    background:linear-gradient(135deg,var(--azul-bright),var(--azul-escuro));
+    border-radius:10px; display:flex; align-items:center; justify-content:center;
+}
+        .logo-text {
+            font-weight:800; font-size:18px;
+            background:linear-gradient(90deg,var(--azul-bright),var(--azul-escuro));
+            -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+        }
+        .sidebar-nav { flex:1; padding:0 12px; display:flex; flex-direction:column; gap:4px; }
+        .nav-section-label {
+            font-size:10px; font-weight:800; color:var(--muted);
+            text-transform:uppercase; letter-spacing:0.12em; padding:16px 12px 8px;
+        }
+        .nav-item {
+            display:flex; align-items:center; gap:12px;
+            padding:12px 16px; border-radius:10px;
+            color:#64748b; font-size:14px; font-weight:600;
+            cursor:pointer; transition:all 0.2s; text-decoration:none;
+            position:relative; margin-bottom:4px;
+        }
+        .nav-item:hover { background:#f1f5f9; color:var(--azul-bright); }
+        .nav-item.active { background:#e3f2fd; color:var(--azul-escuro); font-weight:800; }
+        .nav-item.active::before {
+            content:''; position:absolute; left:0; top:50%; transform:translateY(-50%);
+            width:3px; height:18px; background:var(--azul-bright); border-radius:0 2px 2px 0;
+        }
+        .nav-badge {
+            margin-left:auto; background:#b8d1ff; color:#0059ff;
+            font-size:10px; font-weight:700; padding:2px 7px; border-radius:20px;
+        }
+        .sidebar-footer { padding:16px 12px 0; border-top:1px solid var(--border); margin-top:8px; }
+        .user-card { display:flex; align-items:center; gap:12px; padding:12px; border-radius:12px; background:var(--surface2); }
+        .user-avatar {
+            width:36px; height:36px;
+            background:linear-gradient(135deg,var(--azul-bright),var(--azul-escuro));
+            border-radius:50%; display:flex; align-items:center; justify-content:center;
+            font-size:14px; font-weight:700; color:#fff; flex-shrink:0;
+        }
+        .user-info-name { font-size:13px; font-weight:600; color:var(--texto-cor); }
+        .user-info-role { font-size:11px; color:var(--muted); }
+
+        /* MENU TOGGLE */
+        .menu-toggle {
+            display:none; position:fixed; top:20px; left:20px; z-index:200;
+            background:white; width:44px; height:44px; border-radius:12px;
+            cursor:pointer; align-items:center; justify-content:center;
+            box-shadow:0 5px 15px rgba(0,0,0,0.3); border:none; font-size:18px;
+        }
+
+        /* MAIN */
+        .main-content { position:relative; z-index:10; margin-left:240px; padding:40px 32px; min-height:100vh; }
+
+        /* ANIMAÇÕES */
+        .fade-in { opacity:0; transform:translateY(16px); animation:fadeInUp 0.5s ease forwards; }
+        @keyframes fadeInUp { to { opacity:1; transform:translateY(0); } }
+        .d1{animation-delay:.05s} .d2{animation-delay:.10s} .d3{animation-delay:.15s}
+        .d4{animation-delay:.20s} .d5{animation-delay:.25s}
+
+        /* HEADER */
+        .page-header {
+            background:white; padding:25px 30px; border-radius:20px;
+            margin-bottom:28px; box-shadow:0 10px 20px rgba(0,0,0,0.2);
+            display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:16px;
+        }
+        .header-left h1 { font-size:24px; font-weight:800; text-transform:uppercase; margin-bottom:4px; color:var(--azul-escuro); }
+        .header-left h1 span {
+            background:linear-gradient(90deg,var(--azul-bright),var(--azul-escuro));
+            -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+        }
+        .header-left p { font-size:14px; color:#666; font-weight:600; }
+        .header-right { display:flex; gap:12px; align-items:center; }
+
+        /* PULSAÇÃO NO HEADER badge */
+        .live-badge {
+            display:flex; align-items:center; gap:8px;
+            background:#fff0f0; border:2px solid rgba(239,68,68,0.25);
+            padding:8px 16px; border-radius:20px;
+        }
+        .live-dot {
+            width:10px; height:10px; border-radius:50%; background:#ef4444;
+            animation:pulse 1.4s ease-in-out infinite;
+        }
+        @keyframes pulse {
+            0%,100% { box-shadow:0 0 0 0 rgba(239,68,68,0.5); }
+            50%      { box-shadow:0 0 0 7px rgba(239,68,68,0); }
+        }
+        .live-text { font-size:12px; font-weight:800; color:#ef4444; }
+
+        /* BOTÕES */
+        .btn-primary {
+            background:linear-gradient(135deg,var(--azul-bright),var(--azul-escuro));
+            color:#fff; border:none; padding:10px 20px; border-radius:10px;
+            font-family:'Montserrat',sans-serif; font-size:13px; font-weight:700;
+            cursor:pointer; transition:all 0.2s; display:flex; align-items:center; gap:8px;
+        }
+        .btn-primary:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(50,181,241,0.4); }
+        .btn-ghost {
+            background:white; color:#64748b; border:2px solid #e2e8f0;
+            padding:10px 18px; border-radius:10px;
+            font-family:'Montserrat',sans-serif; font-size:13px; font-weight:600;
+            cursor:pointer; transition:all 0.2s;
+        }
+        .btn-ghost:hover { border-color:var(--azul-bright); color:var(--azul-bright); }
+
+        /* KPI STRIP */
+        .kpi-strip { display:grid; grid-template-columns:repeat(5,1fr); gap:18px; margin-bottom:28px; }
+        .kpi-card {
+            background:white; border-radius:20px; box-shadow:0 10px 20px rgba(0,0,0,0.15);
+            padding:18px 20px; display:flex; align-items:center; gap:12px; transition:all 0.3s;
+            cursor:pointer; border:2px solid transparent;
+        }
+        .kpi-card:hover { transform:translateY(-4px); }
+        .kpi-card.selected { border-color:var(--azul-bright); }
+        .kpi-icon { width:44px; height:44px; border-radius:13px; display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0; }
+        .kpi-icon.red    { background:rgba(239,68,68,0.12); }
+        .kpi-icon.orange { background:rgba(249,115,22,0.12); }
+        .kpi-icon.yellow { background:rgba(251,191,36,0.12); }
+        .kpi-icon.green  { background:rgba(52,211,153,0.12); }
+        .kpi-icon.blue   { background:rgba(50,181,241,0.12); }
+        .kpi-value { font-size:26px; font-weight:800; color:var(--azul-escuro); line-height:1; }
+        .kpi-label { font-size:10px; color:var(--muted); font-weight:800; text-transform:uppercase; margin-top:2px; }
+
+        /* TOOLBAR */
+        .toolbar {
+            background:white; border-radius:20px; box-shadow:0 10px 20px rgba(0,0,0,0.15);
+            padding:18px 24px; margin-bottom:24px;
+            display:flex; align-items:center; gap:12px; flex-wrap:wrap;
+        }
+        .search-box {
+            display:flex; align-items:center; gap:8px;
+            background:#f8fafc; border:2px solid #f0f0f0;
+            border-radius:10px; padding:9px 14px; flex:1; min-width:180px;
+        }
+        .search-box input {
+            background:transparent; border:none; color:var(--texto-cor);
+            font-family:'Montserrat',sans-serif; font-size:13px; font-weight:600; outline:none; width:100%;
+        }
+        .search-box input::placeholder { color:var(--muted); font-weight:400; }
+        .filter-pill {
+            padding:8px 16px; border-radius:20px; border:2px solid #f0f0f0;
+            background:#f8fafc; font-family:'Montserrat',sans-serif;
+            font-size:12px; font-weight:700; color:var(--muted); cursor:pointer; transition:all 0.2s;
+            white-space:nowrap;
+        }
+        .filter-pill:hover   { border-color:var(--azul-bright); color:var(--azul-bright); }
+        .filter-pill.active  { background:#e3f2fd; border-color:var(--azul-bright); color:var(--azul-escuro); }
+        .sort-select {
+            border:2px solid #f0f0f0; border-radius:10px;
+            font-family:'Montserrat',sans-serif; font-weight:700;
+            font-size:12px; padding:8px 12px; color:var(--muted);
+            background:#f8fafc; cursor:pointer; outline:none;
+        }
+
+        /* LAYOUT */
+        .content-grid { display:grid; grid-template-columns:1fr 340px; gap:24px; align-items:start; }
+
+        /* LISTA DE ALERTAS */
+        .alerts-list { display:flex; flex-direction:column; gap:14px; }
+
+        /* CARD DE ALERTA */
+        .alert-card {
+            background:white; border-radius:18px;
+            box-shadow:0 6px 18px rgba(0,0,0,0.08);
+            border-left:5px solid transparent;
+            transition:all 0.25s; cursor:pointer; overflow:hidden;
+        }
+        .alert-card:hover { transform:translateY(-3px); box-shadow:0 14px 32px rgba(0,0,0,0.14); }
+        .alert-card.critico  { border-left-color:#ef4444; }
+        .alert-card.alto     { border-left-color:#f97316; }
+        .alert-card.medio    { border-left-color:#fbbf24; }
+        .alert-card.baixo    { border-left-color:#32B5F1; }
+        .alert-card.resolvido{ border-left-color:#34d399; opacity:0.7; }
+
+        .alert-card-inner { padding:18px 20px; display:flex; gap:16px; align-items:flex-start; }
+        .alert-left { display:flex; flex-direction:column; align-items:center; gap:8px; flex-shrink:0; }
+        .alert-emoji { font-size:26px; }
+        .alert-sev {
+            font-size:9px; font-weight:800; padding:3px 7px;
+            border-radius:20px; text-transform:uppercase; letter-spacing:0.05em; text-align:center;
+        }
+        .alert-sev.critico  { background:rgba(239,68,68,0.12);  color:#ef4444; }
+        .alert-sev.alto     { background:rgba(249,115,22,0.12); color:#f97316; }
+        .alert-sev.medio    { background:rgba(251,191,36,0.12); color:#d97706; }
+        .alert-sev.baixo    { background:rgba(50,181,241,0.12); color:#0277bd; }
+        .alert-sev.resolvido{ background:rgba(52,211,153,0.12); color:#10b981; }
+
+        .alert-body { flex:1; }
+        .alert-titulo { font-size:15px; font-weight:800; color:var(--texto-cor); margin-bottom:5px; line-height:1.3; }
+        .alert-desc   { font-size:12px; font-weight:600; color:var(--muted); line-height:1.6; margin-bottom:12px; }
+
+        .alert-meta { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+        .meta-chip {
+            font-size:10px; font-weight:800; padding:3px 10px;
+            border-radius:20px; background:#f0f4f8; color:var(--muted);
+        }
+        .meta-chip.turma   { background:rgba(50,181,241,0.10); color:var(--azul-escuro); }
+        .meta-chip.aluno   { background:rgba(139,92,246,0.10); color:#8b5cf6; }
+        .meta-chip.curso-adm  { background:rgba(52,211,153,0.10); color:#10b981; }
+        .meta-chip.curso-inf  { background:rgba(50,181,241,0.10); color:#0277bd; }
+        .meta-chip.curso-ma   { background:rgba(249,115,22,0.10); color:#f97316; }
+
+        .alert-time-col { display:flex; flex-direction:column; align-items:flex-end; gap:10px; flex-shrink:0; }
+        .alert-time { font-size:11px; font-weight:600; color:var(--muted); white-space:nowrap; }
+        .alert-actions { display:flex; gap:6px; }
+        .btn-sm {
+            font-size:11px; font-weight:800; padding:5px 12px; border-radius:8px;
+            border:none; cursor:pointer; transition:all 0.18s; font-family:'Montserrat',sans-serif;
+        }
+        .btn-sm.resolve  { background:rgba(52,211,153,0.12); color:#10b981; }
+        .btn-sm.resolve:hover { background:rgba(52,211,153,0.25); }
+        .btn-sm.intervir { background:linear-gradient(135deg,var(--azul-bright),var(--azul-escuro)); color:white; }
+        .btn-sm.intervir:hover { transform:translateY(-1px); box-shadow:0 4px 12px rgba(50,181,241,0.35); }
+        .btn-sm.dismiss  { background:#f1f5f9; color:var(--muted); }
+        .btn-sm.dismiss:hover { background:#e2e8f0; }
+
+        /* ALERTA EXPANDIDO */
+        .alert-expanded {
+            border-top:1px solid #f0f4f8; padding:16px 20px 18px;
+            background:#fafcff; display:none;
+        }
+        .alert-card.open .alert-expanded { display:block; }
+        .exp-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:14px; }
+        .exp-item { background:white; border-radius:10px; padding:12px 14px; }
+        .exp-label { font-size:10px; font-weight:800; color:var(--muted); text-transform:uppercase; margin-bottom:3px; }
+        .exp-val   { font-size:13px; font-weight:800; color:var(--texto-cor); }
+
+        /* EMPTY */
+        .empty-state {
+            background:white; border-radius:20px; box-shadow:0 10px 20px rgba(0,0,0,0.12);
+            padding:60px 32px; text-align:center;
+        }
+        .empty-state-icon { font-size:48px; margin-bottom:14px; }
+        .empty-state-title { font-size:18px; font-weight:800; color:var(--texto-cor); margin-bottom:6px; }
+        .empty-state-sub { font-size:14px; color:var(--muted); font-weight:600; }
+
+        /* PAINEL LATERAL */
+        .side-panel { display:flex; flex-direction:column; gap:20px; }
+
+        .card {
+            background:white; border-radius:20px;
+            box-shadow:0 10px 20px rgba(0,0,0,0.15); padding:22px;
+        }
+        .card-title {
+            font-size:14px; font-weight:800; color:var(--azul-escuro);
+            text-transform:uppercase; margin-bottom:16px; display:flex; align-items:center; gap:8px;
+        }
+
+        /* MAPA DE CALOR */
+        .heatmap-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
+        .heatmap-cell {
+            border-radius:12px; padding:12px 10px; text-align:center; transition:0.2s; cursor:pointer;
+        }
+        .heatmap-cell:hover { transform:scale(1.04); }
+        .heatmap-cell .hc-turma { font-size:12px; font-weight:800; margin-bottom:4px; }
+        .heatmap-cell .hc-score { font-size:18px; font-weight:800; }
+        .heatmap-cell .hc-alerts{ font-size:10px; font-weight:700; margin-top:2px; }
+        .heat-5  { background:#fff0f0; color:#ef4444; }
+        .heat-4  { background:#fff3e0; color:#f97316; }
+        .heat-3  { background:#fffde7; color:#d97706; }
+        .heat-2  { background:#e3f2fd; color:#0277bd; }
+        .heat-1  { background:#e8faf4; color:#10b981; }
+
+        /* INSIGHT CARDS */
+        .insight-row {
+            display:flex; align-items:flex-start; gap:10px;
+            padding:10px 0; border-bottom:1px solid #f0f4f8;
+        }
+        .insight-row:last-child { border-bottom:none; }
+        .insight-icon { font-size:18px; flex-shrink:0; margin-top:1px; }
+        .insight-text { font-size:12px; font-weight:700; color:var(--texto-cor); line-height:1.5; }
+        .insight-text span { font-weight:800; }
+
+        /* MODAL */
+        .modal-overlay {
+            position:fixed; inset:0; z-index:300;
+            background:rgba(0,0,0,0.6); backdrop-filter:blur(4px);
+            display:flex; align-items:center; justify-content:center;
+            opacity:0; pointer-events:none; transition:opacity 0.3s;
+        }
+        .modal-overlay.open { opacity:1; pointer-events:all; }
+        .modal {
+            background:white; border-radius:24px; padding:32px;
+            width:500px; max-width:95vw; max-height:90vh; overflow-y:auto;
+            transform:scale(0.92); transition:transform 0.3s cubic-bezier(.4,0,.2,1);
+            box-shadow:0 40px 80px rgba(0,0,0,0.3);
+        }
+        .modal-overlay.open .modal { transform:scale(1); }
+        .modal-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:22px; }
+        .modal-title  { font-size:18px; font-weight:800; color:var(--azul-escuro); }
+        .modal-close  {
+            width:34px; height:34px; background:#f1f5f9; border:none; border-radius:10px;
+            color:var(--muted); font-size:18px; cursor:pointer;
+            display:flex; align-items:center; justify-content:center;
+        }
+        .modal-close:hover { color:var(--texto-cor); }
+
+        .form-group { display:flex; flex-direction:column; gap:6px; margin-bottom:14px; }
+        .form-label  { font-size:10px; font-weight:800; color:var(--muted); text-transform:uppercase; letter-spacing:0.08em; }
+        .form-input, .form-select, .form-textarea {
+            border:2px solid #f0f0f0; border-radius:10px;
+            font-family:'Montserrat',sans-serif; font-weight:600;
+            font-size:13px; padding:9px 12px; color:var(--texto-cor);
+            background:#f8fafc; outline:none; transition:border-color 0.2s; width:100%;
+        }
+        .form-input:focus, .form-select:focus, .form-textarea:focus { border-color:var(--azul-bright); background:white; }
+        .form-textarea { resize:none; height:80px; line-height:1.5; }
+        .modal-footer { display:flex; gap:10px; margin-top:20px; }
+        .btn-success {
+            background:linear-gradient(135deg,#34d399,#10b981); color:#fff; border:none;
+            padding:11px 20px; border-radius:10px;
+            font-family:'Montserrat',sans-serif; font-size:13px; font-weight:700;
+            cursor:pointer; transition:all 0.2s; flex:1;
+        }
+        .btn-success:hover { transform:translateY(-2px); box-shadow:0 8px 20px rgba(52,211,153,0.4); }
+
+        /* NOTIF TOAST */
+        .toast {
+            position:fixed; bottom:28px; right:28px; z-index:400;
+            background:var(--azul-escuro); color:white;
+            padding:14px 22px; border-radius:14px;
+            font-size:13px; font-weight:700;
+            box-shadow:0 10px 30px rgba(0,0,0,0.3);
+            transform:translateY(80px); opacity:0;
+            transition:all 0.4s cubic-bezier(.4,0,.2,1);
+            display:flex; align-items:center; gap:10px;
+        }
+        .toast.show { transform:translateY(0); opacity:1; }
+
+        /* MOBILE */
+        @media(max-width:1100px) { .content-grid { grid-template-columns:1fr; } .kpi-strip { grid-template-columns:repeat(3,1fr); } }
+        @media(max-width:768px) {
+            .sidebar { transform:translateX(-100%); transition:0.3s; }
+            .sidebar.open { transform:translateX(0); }
+            .menu-toggle { display:flex; }
+            .main-content { margin-left:0; padding:72px 16px 32px; }
+            .kpi-strip { grid-template-columns:1fr 1fr; }
+        }
+
+      .nav-item i { width:18px; height:18px; stroke-width:2; flex-shrink:0; }
+.kpi-icon i, .card-title i, .btn-primary i, .btn-ghost i, .modal-close i { width:18px; height:18px; flex-shrink:0; }
+.kpi-icon i { width:20px; height:20px; }
+    </style>
+</head>
+<body>
+
+<div class="background-layer"></div>
+<div id="particles-container"></div>
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+        <div class="logo-mark">
+<div class="logo-icon" style="font-size:16px;font-weight:800;color:#fff;font-family:'Montserrat',sans-serif;letter-spacing:-1px;"><img src="skin.png"></div>            <span class="logo-text">Mindfine</span>
+        </div>
+    </div>
+    <nav class="sidebar-nav">
+    <div class="nav-section-label">Principal</div>
+    <a href="inicio-escola.html" class="nav-item"><i data-lucide="layout-dashboard"></i> Painel Geral</a>
+    <a href="turma.html" class="nav-item"><i data-lucide="users"></i> Turmas</a>
+    <a href="relatorio.html" class="nav-item"><i data-lucide="trending-up"></i> Relatórios</a>
+    <div class="nav-section-label">Gestão</div>
+    <a href="alertas.html" class="nav-item active">
+        <i data-lucide="bell"></i> Alertas
+        <span class="nav-badge" id="sidebarBadge">8</span>
+    </a>
+    <a href="intervencao.html" class="nav-item"><i data-lucide="target"></i> Intervenções</a>
+</nav>
+    <div class="sidebar-footer">
+        <div class="user-card">
+            <div class="user-avatar">EP</div>
+            <div>
+                <div class="user-info-name">Escola Painel</div>
+                <div class="user-info-role">Administrador</div>
+            </div>
+        </div>
+<a href="login.html" class="nav-item" style="color:#f87171;margin-top:8px;"><i data-lucide="log-out"></i> Sair</a>
+    </div>
+</aside>
+
+<button class="menu-toggle" id="menuToggle"><i data-lucide="menu"></i></button>
+
+<!-- MAIN -->
+<main class="main-content">
+
+    <!-- Header -->
+    <div class="page-header fade-in">
+        <div class="header-left">
+            <h1>Central de <span>Alertas</span></h1>
+            <p>Monitoramento em tempo real do bem-estar escolar</p>
+        </div>
+        <div class="header-right">
+            <div class="live-badge">
+                <div class="live-dot"></div>
+                <span class="live-text">AO VIVO</span>
+            </div>
+            <button class="btn-ghost" onclick="resolverTodos()"><i data-lucide="check-circle"></i> Resolver Todos</button>
+<button class="btn-primary" onclick="abrirModalAlerta()"><i data-lucide="plus"></i> Criar Alerta</button>
+        </div>
+    </div>
+
+    <!-- KPIs -->
+    <div class="kpi-strip fade-in d1">
+        <div class="kpi-card" onclick="filtrarSev('todos')" id="kpi-todos">
+<div class="kpi-icon blue"><i data-lucide="bell"></i></div>
+            <div>
+                <div class="kpi-value" id="kv-todos">15</div>
+                <div class="kpi-label">Total Ativos</div>
+            </div>
+        </div>
+        <div class="kpi-card" onclick="filtrarSev('critico')" id="kpi-critico">
+<div class="kpi-icon red"><i data-lucide="alert-circle"></i></div>
+            <div>
+                <div class="kpi-value" id="kv-critico">3</div>
+                <div class="kpi-label">Críticos</div>
+            </div>
+        </div>
+        <div class="kpi-card" onclick="filtrarSev('alto')" id="kpi-alto">
+<div class="kpi-icon orange"><i data-lucide="alert-triangle"></i></div>
+            <div>
+                <div class="kpi-value" id="kv-alto">5</div>
+                <div class="kpi-label">Alta Prioridade</div>
+            </div>
+        </div>
+        <div class="kpi-card" onclick="filtrarSev('medio')" id="kpi-medio">
+<div class="kpi-icon yellow"><i data-lucide="pin"></i></div>
+            <div>
+                <div class="kpi-value" id="kv-medio">4</div>
+                <div class="kpi-label">Média Prioridade</div>
+            </div>
+        </div>
+        <div class="kpi-card" onclick="filtrarSev('resolvido')" id="kpi-resolvido">
+<div class="kpi-icon green"><i data-lucide="check-circle"></i></div>
+            <div>
+                <div class="kpi-value" id="kv-resolvido">7</div>
+                <div class="kpi-label">Resolvidos Hoje</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toolbar -->
+    <div class="toolbar fade-in d2">
+        <div class="search-box">
+<i data-lucide="search" style="width:16px;height:16px;color:var(--muted);flex-shrink:0;"></i>
+            <input type="text" id="searchInput" placeholder="Buscar por aluno, turma ou descrição…" oninput="renderAlertas()">
+        </div>
+        <button class="filter-pill active" onclick="setPill(this,'todos')">Todos</button>
+<button class="filter-pill"        onclick="setPill(this,'aluno')">Alunos</button>
+<button class="filter-pill"        onclick="setPill(this,'turma')">Turma</button>
+<button class="filter-pill"        onclick="setPill(this,'bem-estar')">Bem-estar</button>
+        <select class="sort-select" id="sortSelect" onchange="renderAlertas()">
+            <option value="data">↓ Mais recente</option>
+            <option value="sev">↓ Mais grave</option>
+            <option value="turma">↓ Por turma</option>
+        </select>
+    </div>
+
+    <!-- Content Grid -->
+    <div class="content-grid fade-in d3">
+
+        <!-- Lista de Alertas -->
+        <div>
+            <div id="alertsContainer"></div>
+        </div>
+
+        <!-- Painel Lateral -->
+        <div class="side-panel fade-in d4">
+
+            <!-- Mapa de calor -->
+            <div class="card">
+<div class="card-title"><i data-lucide="map"></i> Mapa de Risco por Turma</div>
+                <div class="heatmap-grid" id="heatmapGrid"></div>
+                <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;">
+                    <div style="display:flex;align-items:center;gap:5px;font-size:10px;font-weight:800;color:var(--muted);">
+                        <span style="width:10px;height:10px;border-radius:3px;background:#fff0f0;display:inline-block;border:1px solid #efb4b4;"></span> Crítico
+                    </div>
+                    <div style="display:flex;align-items:center;gap:5px;font-size:10px;font-weight:800;color:var(--muted);">
+                        <span style="width:10px;height:10px;border-radius:3px;background:#fff3e0;display:inline-block;border:1px solid #f0c4a0;"></span> Alto
+                    </div>
+                    <div style="display:flex;align-items:center;gap:5px;font-size:10px;font-weight:800;color:var(--muted);">
+                        <span style="width:10px;height:10px;border-radius:3px;background:#fffde7;display:inline-block;border:1px solid #f0e0a0;"></span> Médio
+                    </div>
+                    <div style="display:flex;align-items:center;gap:5px;font-size:10px;font-weight:800;color:var(--muted);">
+                        <span style="width:10px;height:10px;border-radius:3px;background:#e8faf4;display:inline-block;border:1px solid #a8eac8;"></span> OK
+                    </div>
+                </div>
+            </div>
+
+            <!-- Insights automáticos -->
+            <div class="card">
+<div class="card-title"><i data-lucide="lightbulb"></i> Insights Automáticos</div>
+<div class="insight-row" onclick="window.location='relatorio.html'" style="cursor:pointer;">
+<span class="insight-icon"><i data-lucide="trending-up" style="width:18px;height:18px;color:#32B5F1"></i></span>
+                    <div class="insight-text">Alertas de ansiedade subiram <span>+40%</span> esta semana. Período próximo de avaliações pode ser o fator.</div>
+                </div>
+<div class="insight-row" onclick="window.location='relatorio.html'" style="cursor:pointer;">
+<span class="insight-icon"><i data-lucide="alert-circle" style="width:18px;height:18px;color:#ef4444"></i></span>
+                    <div class="insight-text">Turmas de <span>Meio Ambiente</span> concentram 60% dos alertas críticos do mês.</div>
+                </div>
+<div class="insight-row" onclick="window.location='relatorio.html'" style="cursor:pointer;">
+<span class="insight-icon"><i data-lucide="user" style="width:18px;height:18px;color:#8b5cf6"></i></span>
+                    <div class="insight-text"><span>Um(a) aluno(a) de 2° ADM</span>está em estado crítico há 7 dias consecutivos sem intervenção registrada.</div>
+                </div>
+<div class="insight-row" onclick="window.location='relatorio.html'" style="cursor:pointer;">
+<span class="insight-icon"><i data-lucide="check-circle" style="width:18px;height:18px;color:#10b981"></i></span>
+                    <div class="insight-text">Taxa de resolução de alertas esta semana: <span>73%</span>. Melhor desempenho do mês.</div>
+                </div>
+<div class="insight-row" onclick="window.location='relatorio.html'" style="cursor:pointer;">
+<span class="insight-icon"><i data-lucide="clock" style="width:18px;height:18px;color:#f59e0b"></i></span>
+                    <div class="insight-text">Pico de alertas ocorre às <span>segunda-feiras</span>. Considere atividades de acolhimento no início da semana.</div>
+                </div>
+            </div>
+
+            <!-- Resolução recente -->
+            <div class="card">
+<div class="card-title"><i data-lucide="check-circle"></i> Resolvidos Recentemente</div>
+                <div id="resolvidosContainer"></div>
+            </div>
+
+        </div>
+    </div>
+
+</main>
+
+<!-- MODAL CRIAR ALERTA -->
+<div class="modal-overlay" id="modalOverlay" onclick="fecharModal(event)">
+    <div class="modal">
+        <div class="modal-header">
+            <div class="modal-title"><i data-lucide="bell" style="width:18px;height:18px;color:var(--azul-bright);margin-right:6px;"></i> Novo Alerta Manual</div>
+<button class="modal-close" onclick="fecharModalBtn()"><i data-lucide="x"></i></button>
+        </div>
+        <div class="form-group">
+            <label class="form-label">Título do Alerta</label>
+            <input class="form-input" id="fTitulo" type="text" placeholder="Ex: Comportamento preocupante — aluno X">
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+            <div class="form-group">
+                <label class="form-label">Turma</label>
+                <select class="form-select" id="fTurma">
+                    <option>1° ADM</option><option>2° ADM</option><option>3° ADM</option>
+                    <option>1° INF</option><option>2° INF</option><option>3° INF</option>
+                    <option>1° MA</option><option>2° MA</option><option>3° MA</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Severidade</label>
+                <select class="form-select" id="fSev">
+                    <option value="critico">Crítico</option>
+                    <option value="alto">Alto</option>
+                    <option value="medio" selected>Médio</option>
+                    <option value="baixo">Baixo</option>
+                </select>
+            </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+            <div class="form-group">
+                <label class="form-label">Tipo</label>
+                <select class="form-select" id="fTipo">
+                    <option value="aluno">Aluno específico</option>
+                    <option value="turma">Turma</option>
+                    <option value="bem-estar">Bem-estar</option>
+                    <option value="participacao">Participação</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="form-label">Descrição</label>
+            <textarea class="form-textarea" id="fDesc" placeholder="Descreva a situação que motivou este alerta…"></textarea>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-ghost" onclick="fecharModalBtn()" style="flex:1">Cancelar</button>
+            <button class="btn-success" onclick="criarAlerta()">✓ Criar Alerta</button>
+        </div>
+    </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">
+    <span id="toastIcon">✅</span>
+    <span id="toastMsg">Alerta resolvido com sucesso!</span>
+</div>
+
+<script>
+/* ── BOLHAS ── */
+function createBubble() {
+    const c = document.getElementById('particles-container');
+    const b = document.createElement('div');
+    b.className = 'bubble';
+    const s = Math.random() * 20 + 5;
+    b.style.width = b.style.height = s + 'px';
+    b.style.left = Math.random() * 100 + '%';
+    b.style.animationDuration = (Math.random() * 5 + 8) + 's';
+    c.appendChild(b); setTimeout(() => b.remove(), 10000);
+}
+setInterval(createBubble, 1500);
+document.getElementById('menuToggle').addEventListener('click', () => document.getElementById('sidebar').classList.toggle('open'));
+
+/* ── DATA ── */
+let alertas = [
+    {
+        id:1, sev:'critico', tipo:'aluno', emoji:'alert-circle',
+titulo:'Bem-estar crítico — Aluno(a) 2° ADM',
+        desc:'Score de bem-estar abaixo de 3.0 por 7 dias consecutivos. Última resposta registrada: "me sinto invisível e sem energia para nada".',
+        turma:'2° ADM', curso:'adm', aluno: null,
+        data:'Hoje, 08:15', resolvido:false,
+        detalhes:{ 'Dias em alerta':'7', 'Score atual':'2.8', 'Último check-in':'Hoje às 07:42', 'Emoção relatada':'😢 Tristeza' }
+    },
+    {
+        id:2, sev:'critico', tipo:'aluno', emoji:'alert-circle',
+        titulo:'Ideação negativa detectada — Aluno(a) 2° ADM',
+        desc:'Resposta ao questionário contém linguagem associada a sofrimento intenso. Encaminhamento para psicólogo recomendado com urgência.',
+        turma:'2° ADM', curso:'adm', aluno: null,
+        data:'Hoje, 07:50', resolvido:false,
+        detalhes:{ 'Dias em alerta':'3', 'Score atual':'3.2', 'Último check-in':'Hoje às 07:32', 'Emoção relatada':'😰 Ansiedade' }
+    },
+    {
+        id:3, sev:'critico', tipo:'turma', emoji:'alert-circle',
+        titulo:'Queda abrupta — 1° MA',
+        desc:'Bem-estar médio da turma caiu 2.1 pontos em 3 dias. 4 alunos abaixo do score 4.0 simultaneamente.',
+        turma:'1° MA', curso:'ma', aluno:null,
+        data:'Hoje, 07:30', resolvido:false,
+        detalhes:{ 'Queda':'−2.1 pts em 3 dias', 'Score atual':'5.2', 'Alunos críticos':'4', 'Turno':'Manhã' }
+    },
+    {
+        id:4, sev:'alto', tipo:'bem-estar', emoji:'alert-triangle',
+        titulo:'Ansiedade elevada — 2° MA',
+        desc:'27% da turma relatou ansiedade hoje. Padrão recorrente às segundas-feiras, possivelmente relacionado a provas.',
+        turma:'2° MA', curso:'ma', aluno:null,
+        data:'Hoje, 07:15', resolvido:false,
+        detalhes:{ 'Alunos afetados':'6 de 23', 'Score médio':'5.8', 'Dia crítico':'Segunda-feira', 'Padrão':'3 semanas consecutivas' }
+    },
+    {
+        id:5, sev:'alto', tipo:'aluno', emoji:'alert-triangle',
+        titulo:'Ausência emocional — 1 informática',
+        desc:'Aluno deixou de responder ao check-in emocional há 5 dias. Histórico de bem-estar instável no mês.',
+        turma:'2° ADM', curso:'adm', aluno:null,
+        data:'Ontem, 16:40', resolvido:false,
+        detalhes:{ 'Dias sem resposta':'5', 'Último score':'4.1', 'Emoção anterior':'😢 Tristeza', 'Check-ins no mês':'12 de 20' }
+    },
+    {
+        id:6, sev:'alto', tipo:'participacao', emoji:'clipboard-list',
+        titulo:'Baixa participação — 3° MA',
+        desc:'Taxa de participação caiu para 65% esta semana, abaixo da meta de 80%. 8 alunos sem nenhuma resposta desde sexta.',
+        turma:'3° MA', curso:'ma', aluno:null,
+        data:'Ontem, 15:00', resolvido:false,
+        detalhes:{ 'Participação atual':'65%', 'Meta':'80%', 'Alunos ausentes':'8', 'Queda vs semana anterior':'−18%' }
+    },
+    {
+        id:7, sev:'alto', tipo:'bem-estar', emoji:'alert-triangle',
+        titulo:'Padrão de tristeza — 3° ADM',
+        desc:'Dois alunos com tristeza registrada por mais de 10 dias consecutivos. Coordenação notificada, sem intervenção iniciada.',
+        turma:'3° ADM', curso:'adm', aluno:null,
+        data:'Ontem, 14:00', resolvido:false,
+        detalhes:{ 'Alunos em padrão':'2', 'Dias consecutivos':'10+', 'Score médio do grupo':'4.8', 'Intervenção':'Não iniciada' }
+    },
+    {
+        id:8, sev:'alto', tipo:'aluno', emoji:'alert-triangle',
+        titulo:'Aluno novo em sofrimento — 1 ADM',
+        desc:'Primeira detecção de score abaixo de 4.0. Score de 3.6 registrado hoje. Histórico até então estável.',
+        turma:'2° ADM', curso:'adm', aluno:'Amanda Farias',
+        data:'Ontem, 09:20', resolvido:false,
+        detalhes:{ 'Score atual':'3.6', 'Score anterior':'7.2', 'Queda':'−3.6 pts', 'Primeiro alerta':'Sim' }
+    },
+    {
+        id:9, sev:'medio', tipo:'bem-estar', emoji:'pin',
+        titulo:'Score abaixo da média — 2° INF',
+        desc:'Bem-estar médio de 6.9 está 0.5 pontos abaixo da média histórica desta turma. Acompanhamento recomendado.',
+        turma:'2° INF', curso:'inf', aluno:null,
+        data:'Ontem, 08:00', resolvido:false,
+        detalhes:{ 'Score atual':'6.9', 'Média histórica':'7.4', 'Desvio':'−0.5', 'Tendência':'Queda gradual' }
+    },
+    {
+        id:10, sev:'medio', tipo:'participacao', emoji:'clipboard-list',
+        titulo:'Participação em queda — 2° MA',
+        desc:'Terceira semana consecutiva com queda na participação. Tendência de desengajamento progressivo.',
+        turma:'2° MA', curso:'ma', aluno:null,
+        data:'12/05, 14:30', resolvido:false,
+        detalhes:{ 'Participação':'79%', 'Queda acumulada':'−12% em 3 sem.', 'Pior dia':'Segunda-feira', 'Intervenção sugerida':'Gamificação' }
+    },
+    {
+        id:11, sev:'medio', tipo:'aluno', emoji:'pin',
+        titulo:'Instabilidade emocional — 3 ADM',
+        desc:'Emoções alternando entre ansiedade e tristeza sem padrão estável. Score oscilou entre 4 e 8 na mesma semana.',
+        turma:'2° INF', curso:'inf', aluno:'Felipe Costa',
+        data:'12/05, 10:00', resolvido:false,
+        detalhes:{ 'Score mínimo':'4.0', 'Score máximo':'8.1', 'Oscilação':'4.1 pts', 'Padrão':'Instável há 2 semanas' }
+    },
+    {
+        id:12, sev:'medio', tipo:'bem-estar', emoji:'pin',
+        titulo:'Ansiedade crescente pré-avaliação — 1° INF',
+        desc:'Score caiu de 8.2 para 7.1 esta semana com avaliação programada para sexta-feira.',
+        turma:'1° INF', curso:'inf', aluno:null,
+        data:'11/05, 16:00', resolvido:false,
+        detalhes:{ 'Score atual':'7.1', 'Score anterior':'8.2', 'Causa provável':'Avaliação 16/05', 'Alunos ansiosos':'5' }
+    },
+];
+
+let resolvidos = [
+    { titulo:'Roda de conversa realizada — 3° MA', time:'Hoje, 09:00' },
+    { titulo:'Acolhimento concluído — 1° INF',    time:'Ontem, 14:00' },
+    { titulo:'Contato com família — Pedro V.',     time:'Ontem, 11:30' },
+    { titulo:'Sessão de relaxamento aplicada',     time:'12/05, 10:00' },
+];
+
+let filtroSev  = 'todos';
+let filtroTipo = 'todos';
+let openCard   = null;
+
+/* ── SEVERIDADE ORDINAL ── */
+const sevOrd = { critico:4, alto:3, medio:2, baixo:1, resolvido:0 };
+
+/* ── RENDER ALERTAS ── */
+function renderAlertas() {
+    const q    = (document.getElementById('searchInput')?.value || '').toLowerCase();
+    const sort = document.getElementById('sortSelect')?.value || 'data';
+
+    let lista = alertas.filter(a => {
+        const sevOk  = filtroSev === 'todos' || (filtroSev === 'resolvido' ? a.resolvido : (!a.resolvido && a.sev === filtroSev));
+        const tipoOk = filtroTipo === 'todos' || a.tipo === filtroTipo;
+        const qOk    = q === '' || a.titulo.toLowerCase().includes(q) ||
+                       a.turma.toLowerCase().includes(q) ||
+                       (a.aluno || '').toLowerCase().includes(q) ||
+                       a.desc.toLowerCase().includes(q);
+        return sevOk && tipoOk && qOk;
+    });
+
+    if (sort === 'sev')   lista.sort((a,b) => sevOrd[b.sev] - sevOrd[a.sev]);
+    if (sort === 'turma') lista.sort((a,b) => a.turma.localeCompare(b.turma));
+
+    const container = document.getElementById('alertsContainer');
+
+    if (lista.length === 0) {
+        container.innerHTML = `
+        <div class="empty-state">
+<div class="empty-state-icon"><i data-lucide="check-circle" style="width:48px;height:48px;color:#10b981;"></i></div>
+            <div class="empty-state-title">Nenhum alerta encontrado</div>
+            <div class="empty-state-sub">Tudo tranquilo aqui! Ajuste os filtros se precisar.</div>
+        </div>`;
+        return;
+    }
+
+    container.innerHTML = `<div class="alerts-list">${lista.map(a => alertCardHTML(a)).join('')}</div>`;
+    updateKPIs();
+}
+
+function alertCardHTML(a) {
+    const sevLabel = { critico:'Crítico', alto:'Alto', medio:'Médio', baixo:'Baixo', resolvido:'Resolvido' };
+    const cursoChip = a.curso ? `<span class="meta-chip curso-${a.curso}">${{adm:'Administração',inf:'Informática',ma:'Meio Ambiente'}[a.curso] || ''}</span>` : '';
+const alunoChip = a.aluno ? `<span class="meta-chip aluno">${a.aluno}</span>` : '';
+    const resolvidoCls = a.resolvido ? ' resolvido' : '';
+
+    const detailsHTML = `
+        <div class="alert-expanded" id="exp-${a.id}">
+            <div class="exp-grid">
+                ${Object.entries(a.detalhes).map(([k,v]) => `
+                    <div class="exp-item">
+                        <div class="exp-label">${k}</div>
+                        <div class="exp-val">${v}</div>
+                    </div>`).join('')}
+            </div>
+            <div style="display:flex;gap:8px;">
+                <button class="btn-sm intervir" onclick="event.stopPropagation();criarIntervencaoRapida(${a.id})">Criar Intervenção</button>
+                ${!a.resolvido ? `<button class="btn-sm resolve" onclick="event.stopPropagation();resolver(${a.id})">Marcar Resolvido</button>` : ''}
+                <button class="btn-sm dismiss" onclick="event.stopPropagation();descartar(${a.id})">Descartar</button>
+            </div>
+        </div>`;
+
+    return `
+    <div class="alert-card ${a.sev}${resolvidoCls}" id="card-${a.id}" onclick="toggleCard(${a.id})">
+        <div class="alert-card-inner">
+            <div class="alert-left">
+<span class="alert-emoji"><i data-lucide="${a.emoji}" style="width:24px;height:24px;"></i></span>
+                <span class="alert-sev ${a.resolvido ? 'resolvido' : a.sev}">${a.resolvido ? 'Resolvido' : sevLabel[a.sev]}</span>
+            </div>
+            <div class="alert-body">
+                <div class="alert-titulo">${a.titulo}</div>
+                <div class="alert-desc">${a.desc}</div>
+                <div class="alert-meta">
+<span class="meta-chip turma">${a.turma}</span>
+                    ${alunoChip}
+                    ${cursoChip}
+<span class="meta-chip">${{aluno:'Individual', turma:'Coletivo','bem-estar':'Bem-estar', participacao:'Participação'}[a.tipo]}</span>
+                </div>
+            </div>
+            <div class="alert-time-col">
+                <span class="alert-time"> ${a.data}</span>
+                <div class="alert-actions" onclick="event.stopPropagation()">
+                    ${!a.resolvido
+                        ? `<button class="btn-sm resolve"  onclick="resolver(${a.id})">Resolver</button>
+                           <button class="btn-sm intervir" onclick="criarIntervencaoRapida(${a.id})">Intervir</button>`
+                        : `<button class="btn-sm dismiss" onclick="descartar(${a.id})">Descartar</button>`
+                    }
+                </div>
+            </div>
+        </div>
+        ${detailsHTML}
+    </div>`;
+}
+
+/* ── TOGGLE EXPANSÃO ── */
+function toggleCard(id) {
+    const card = document.getElementById('card-' + id);
+    const exp  = document.getElementById('exp-'  + id);
+    if (!card || !exp) return;
+    if (openCard && openCard !== id) {
+        const prev = document.getElementById('card-' + openCard);
+        const prevExp = document.getElementById('exp-' + openCard);
+        if (prev) prev.classList.remove('open');
+        if (prevExp) prevExp.style.display = 'none';
+    }
+    const isOpen = card.classList.toggle('open');
+    exp.style.display = isOpen ? 'block' : 'none';
+    openCard = isOpen ? id : null;
+}
+
+/* ── FILTROS ── */
+function filtrarSev(sev) {
+    filtroSev = sev;
+    document.querySelectorAll('.kpi-card').forEach(k => k.classList.remove('selected'));
+    document.getElementById('kpi-' + sev)?.classList.add('selected');
+    renderAlertas();
+}
+
+function setPill(btn, tipo) {
+    document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    filtroTipo = tipo;
+    renderAlertas();
+}
+
+/* ── AÇÕES ── */
+function resolver(id) {
+    const a = alertas.find(x => x.id === id);
+    if (!a) return;
+    a.resolvido = true;
+    a.sev = 'resolvido';
+    resolvidos.unshift({ titulo: a.titulo, time: 'Agora mesmo' });
+    if (resolvidos.length > 5) resolvidos.pop();
+    renderAlertas();
+    renderResolvidos();
+    renderHeatmap();
+    toast('', 'Alerta marcado como resolvido!');
+}
+
+function descartar(id) {
+    alertas = alertas.filter(x => x.id !== id);
+    renderAlertas();
+    renderHeatmap();
+    toast('', 'Alerta descartado.');
+}
+
+function resolverTodos() {
+    alertas.forEach(a => { if (!a.resolvido) { a.resolvido = true; a.sev = 'resolvido'; } });
+    renderAlertas(); renderHeatmap();
+    toast('', 'Todos os alertas foram resolvidos!');
+}
+
+function criarIntervencaoRapida(id) {
+    const a = alertas.find(x => x.id === id);
+    if (!a) return;
+    toast('', `Intervenção criada para "${a.turma}"!`);
+    resolver(id);
+    setTimeout(() => window.location = 'intervencoes.html', 1500);
+}
+
+/* ── MODAL ── */
+function abrirModalAlerta() { document.getElementById('modalOverlay').classList.add('open'); }
+function fecharModal(e) { if (e.target === document.getElementById('modalOverlay')) fecharModalBtn(); }
+function fecharModalBtn()  { document.getElementById('modalOverlay').classList.remove('open'); }
+
+function criarAlerta() {
+    const titulo = document.getElementById('fTitulo').value.trim();
+    if (!titulo) { document.getElementById('fTitulo').focus(); return; }
+const sevMap = { critico:'alert-circle', alto:'alert-triangle', medio:'pin', baixo:'info' };
+    const sev     = document.getElementById('fSev').value;
+    const tipo    = document.getElementById('fTipo').value;
+    const turma   = document.getElementById('fTurma').value;
+const aluno = null;
+    const desc    = document.getElementById('fDesc').value.trim() || 'Alerta criado manualmente.';
+    const cursoMap= { ADM:'adm', INF:'inf', MA:'ma' };
+    const curso   = Object.keys(cursoMap).find(k => turma.includes(k));
+
+    alertas.unshift({
+        id: Date.now(), sev, tipo, emoji: sevMap[sev],
+        titulo, desc, turma, curso: curso ? cursoMap[curso] : 'adm',
+        aluno, data: 'Agora mesmo', resolvido: false,
+        detalhes: { 'Criado por':'Manual', 'Turma':turma, 'Tipo': tipo, 'Severidade': sev }
+    });
+
+    fecharModalBtn();
+    ['fTitulo','fAluno','fDesc'].forEach(id => document.getElementById(id).value = '');
+    renderAlertas(); renderHeatmap();
+    toast('', 'Novo alerta criado com sucesso!');
+}
+
+/* ── KPIs ── */
+function updateKPIs() {
+    const ativos = alertas.filter(a => !a.resolvido);
+    document.getElementById('kv-todos').textContent    = ativos.length;
+    document.getElementById('kv-critico').textContent  = ativos.filter(a => a.sev==='critico').length;
+    document.getElementById('kv-alto').textContent     = ativos.filter(a => a.sev==='alto').length;
+    document.getElementById('kv-medio').textContent    = ativos.filter(a => a.sev==='medio').length;
+    document.getElementById('kv-resolvido').textContent= resolvidos.length;
+    document.getElementById('sidebarBadge').textContent= ativos.length;
+}
+
+/* ── HEATMAP ── */
+const turmasHeat = [
+    { nome:'1° ADM', score:8.5 }, { nome:'2° ADM', score:5.8 }, { nome:'3° ADM', score:7.9 },
+    { nome:'1° INF', score:8.2 }, { nome:'2° INF', score:6.9 }, { nome:'3° INF', score:7.4 },
+    { nome:'1° MA',  score:5.8 }, { nome:'2° MA',  score:5.8 }, { nome:'3° MA',  score:5.8 },
+];
+
+function renderHeatmap() {
+    document.getElementById('heatmapGrid').innerHTML = turmasHeat.map(t => {
+        const alertCount = alertas.filter(a => a.turma === t.nome && !a.resolvido).length;
+        const heatClass  = alertCount >= 3 ? 'heat-5' : alertCount >= 2 ? 'heat-4' : alertCount === 1 ? 'heat-3' : t.score >= 7.5 ? 'heat-1' : 'heat-2';
+        return `
+        <div class="heatmap-cell ${heatClass}" onclick="filtrarTurma('${t.nome}')" title="Clique para filtrar">
+            <div class="hc-turma">${t.nome}</div>
+            <div class="hc-score">${t.score}</div>
+            <div class="hc-alerts">${alertCount > 0 ? alertCount + ' alerta' + (alertCount>1?'s':'') : 'OK'}</div>
+        </div>`;
+    }).join('');
+}
+
+function filtrarTurma(turma) {
+    document.getElementById('searchInput').value = turma;
+    renderAlertas();
+    document.getElementById('alertsContainer').scrollIntoView({ behavior:'smooth' });
+}
+
+/* ── RESOLVIDOS ── */
+function renderResolvidos() {
+    document.getElementById('resolvidosContainer').innerHTML = resolvidos.map(r => `
+        <div style="display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid #f0f4f8;">
+<i data-lucide="check-circle" style="color:#10b981;width:16px;height:16px;flex-shrink:0;margin-top:1px;"></i>
+            <div>
+                <div style="font-size:12px;font-weight:800;color:var(--texto-cor);line-height:1.3;">${r.titulo}</div>
+<div style="font-size:10px;font-weight:600;color:var(--muted);margin-top:2px;">${r.time}</div>
+            </div>
+        </div>
+    `).join('') + `<div style="border-bottom:none !important;"></div>`;
+}
+
+/* ── TOAST ── */
+function toast(icon, msg) {
+    const t = document.getElementById('toast');
+    document.getElementById('toastIcon').textContent = icon;
+    document.getElementById('toastMsg').textContent  = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+
+/* ── INIT ── */
+renderAlertas();
+renderHeatmap();
+renderResolvidos();
+lucide.createIcons();
+</script>
+</body>
+</html>
